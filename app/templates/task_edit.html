@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Task</title>
+    <link rel="stylesheet" href="/static/styles.css?v=30">
+</head>
+<body>
+    <div class="page">
+        <header class="topbar">
+            <h1>Edit Task</h1>
+            <p><a href="/schedule">← Back to Schedule</a></p>
+        </header>
+
+        <section class="card">
+            <form method="post" action="/tasks/{{ task.id }}/edit" class="form-stack">
+                <label>Title</label>
+                <input type="text" name="title" value="{{ task.title }}" required>
+
+                <label>Status</label>
+                <select name="status">
+                    <option value="open" {% if task.status == "open" %}selected{% endif %}>Open</option>
+                    <option value="in progress" {% if task.status == "in progress" %}selected{% endif %}>In Progress</option>
+                    <option value="done" {% if task.status == "done" %}selected{% endif %}>Done</option>
+                </select>
+
+                <label>Job Type</label>
+                <input type="text" name="job_type" value="{{ task.job_type }}">
+
+                <label>Due Date</label>
+                <input type="date" name="due_date" value="{{ task.due_date }}">
+
+                <label>Assigned To</label>
+                <input type="text" name="assigned_to" value="{{ task.assigned_to }}">
+
+                <label>Reminder Type</label>
+                <select name="reminder_type">
+                    <option value="" {% if not task.reminder_type %}selected{% endif %}>None</option>
+                    <option value="weekly" {% if task.reminder_type == "weekly" %}selected{% endif %}>Weekly</option>
+                    <option value="monthly" {% if task.reminder_type == "monthly" %}selected{% endif %}>Monthly</option>
+                    <option value="opening follow-up" {% if task.reminder_type == "opening follow-up" %}selected{% endif %}>Opening Follow-up</option>
+                    <option value="closing follow-up" {% if task.reminder_type == "closing follow-up" %}selected{% endif %}>Closing Follow-up</option>
+                </select>
+
+                <label>Recurring?</label>
+                <select name="is_recurring">
+                    <option value="false" {% if not task.is_recurring %}selected{% endif %}>No</option>
+                    <option value="true" {% if task.is_recurring %}selected{% endif %}>Yes</option>
+                </select>
+
+                <label>Client</label>
+                <select name="client_id">
+                    <option value="0" {% if not task.client_id %}selected{% endif %}>None</option>
+                    {% for c in clients %}
+                        <option value="{{ c.id }}" {% if task.client_id == c.id %}selected{% endif %}>
+                            {{ c.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label>Notes</label>
+                <textarea name="notes">{{ task.notes }}</textarea>
+
+                <button type="submit">Save Changes</button>
+            </form>
+
+            <form method="post" action="/tasks/{{ task.id }}/delete">
+                <button type="submit" style="background:red; margin-top:10px;">Delete Task</button>
+            </form>
+        </section>
+    </div>
+</body>
+</html>

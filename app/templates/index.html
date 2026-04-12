@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pool Ops Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/styles.css?v=30">
+</head>
+<body>
+    <div class="page">
+        <header class="topbar">
+            <h1>Pool Ops</h1>
+            <p>Field dashboard</p>
+            <div class="quick-links">
+                <a href="/schedule">Schedule</a>
+                {% if overdue_count > 0 %}
+                    <a href="/schedule">Overdue: {{ overdue_count }}</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <div class="grid two">
+            <section class="card">
+                <h2>Add Client</h2>
+                <form method="post" action="/clients/add" class="form-stack">
+                    <label>Name</label>
+                    <input type="text" name="name" required>
+
+                    <label>Phone</label>
+                    <input type="text" name="phone">
+
+                    <label>Email</label>
+                    <input type="email" name="email">
+
+                    <button type="submit">Add Client</button>
+                </form>
+            </section>
+
+            <section class="card">
+                <h2>Add Reminder / Task</h2>
+                <form method="post" action="/tasks/add" class="form-stack">
+                    <label>Task Title</label>
+                    <input type="text" name="title" required>
+
+                    <label>Job Type</label>
+                    <input type="text" name="job_type">
+
+                    <label>Due Date</label>
+                    <input type="date" name="due_date">
+
+                    <label>Assigned To</label>
+                    <input type="text" name="assigned_to">
+
+                    <label>Reminder Type</label>
+                    <select name="reminder_type">
+                        <option value="">None</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="opening follow-up">Opening Follow-up</option>
+                        <option value="closing follow-up">Closing Follow-up</option>
+                    </select>
+
+                    <label>Recurring?</label>
+                    <select name="is_recurring">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+
+                    <button type="submit">Add Task</button>
+                </form>
+            </section>
+        </div>
+
+        <section class="card">
+            <h2>Clients</h2>
+            {% if clients %}
+                <ul class="list">
+                    {% for client in clients %}
+                        <li class="list-row">
+                            <strong><a href="/clients/{{ client.id }}">{{ client.name }}</a></strong><br>
+                            {% if client.phone %}<span>{{ client.phone }}</span><br>{% endif %}
+                            {% if client.email %}<span>{{ client.email }}</span>{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No clients yet.</p>
+            {% endif %}
+        </section>
+
+        <section class="card">
+            <h2>Recent Tasks</h2>
+            {% if tasks %}
+                <ul class="list">
+                    {% for task in tasks %}
+                        <li class="list-row">
+                            <strong>{{ task.title }}</strong><br>
+                            <span>Status: {{ task.status }}</span><br>
+                            {% if task.due_date %}<span>Due: {{ task.due_date }}</span><br>{% endif %}
+                            {% if task.assigned_to %}<span>Assigned: {{ task.assigned_to }}</span><br>{% endif %}
+                            {% if task.reminder_type %}<span>Reminder: {{ task.reminder_type }}</span><br>{% endif %}
+                            {% if task.is_recurring %}<span>Recurring: Yes</span><br>{% endif %}
+                            {% if task.client %}
+                                <span>Client: <a href="/clients/{{ task.client.id }}">{{ task.client.name }}</a></span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No tasks yet.</p>
+            {% endif %}
+        </section>
+    </div>
+
+    <nav class="mobile-actions">
+        <a href="/">Home</a>
+        <a href="/schedule">Schedule</a>
+    </nav>
+</body>
+</html>

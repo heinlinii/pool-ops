@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ client.name }} - Client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/styles.css?v=20">
+</head>
+<body>
+    <div class="page">
+        <header class="topbar">
+            <h1>{{ client.name }}</h1>
+            <p>Client record</p>
+            <div class="quick-links">
+                <a href="/">Dashboard</a>
+                {% if client.phone %}<a href="tel:{{ client.phone }}">Call</a>{% endif %}
+                {% if client.email %}<a href="mailto:{{ client.email }}">Email</a>{% endif %}
+            </div>
+        </header>
+
+        <div class="grid two">
+            <section class="card">
+                <h2>Add Property</h2>
+                <form method="post" action="/clients/{{ client.id }}/properties/add" class="form-stack">
+                    <label>Address</label>
+                    <input type="text" name="address" required>
+
+                    <label>Pool Type</label>
+                    <input type="text" name="pool_type">
+
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+
+                    <button type="submit">Add Property</button>
+                </form>
+            </section>
+
+            <section class="card">
+                <h2>Add Task</h2>
+                <form method="post" action="/tasks/add" class="form-stack">
+                    <input type="hidden" name="client_id" value="{{ client.id }}">
+
+                    <label>Task Title</label>
+                    <input type="text" name="title" required>
+
+                    <label>Job Type</label>
+                    <input type="text" name="job_type">
+
+                    <label>Due Date</label>
+                    <input type="date" name="due_date">
+
+                    <label>Assigned To</label>
+                    <input type="text" name="assigned_to">
+
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+
+                    <button type="submit">Add Task</button>
+                </form>
+            </section>
+        </div>
+
+        <section class="card">
+            <h2>Properties</h2>
+            {% if client.properties %}
+                <ul class="list">
+                    {% for prop in client.properties %}
+                        <li class="list-row">
+                            <strong><a href="/properties/{{ prop.id }}">{{ prop.address }}</a></strong><br>
+                            {% if prop.pool_type %}<span>{{ prop.pool_type }}</span><br>{% endif %}
+                            {% if prop.notes %}<span>{{ prop.notes }}</span>{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No properties yet.</p>
+            {% endif %}
+        </section>
+
+        <section class="card">
+            <h2>Tasks</h2>
+            {% if client.tasks %}
+                <ul class="list">
+                    {% for task in client.tasks %}
+                        <li class="list-row">
+                            <strong>{{ task.title }}</strong><br>
+                            <span>Status: {{ task.status }}</span><br>
+                            {% if task.due_date %}<span>Due: {{ task.due_date }}</span><br>{% endif %}
+                            {% if task.assigned_to %}<span>Assigned: {{ task.assigned_to }}</span><br>{% endif %}
+                            {% if task.notes %}<span>{{ task.notes }}</span>{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No tasks yet.</p>
+            {% endif %}
+        </section>
+    </div>
+
+    <nav class="mobile-actions">
+        <a href="/">Home</a>
+        <a href="/schedule">Schedule</a>
+    </nav>
+</body>
+</html>

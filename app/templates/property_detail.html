@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ property.address }} - Property</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/styles.css?v=50">
+    <style>
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .photo-card {
+            border: 1px solid #e6e9ed;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fafbfc;
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .section-gap {
+            margin-top: 16px;
+        }
+
+        .money-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .money-box {
+            background: #fafbfc;
+            border: 1px solid #e6e9ed;
+            border-radius: 10px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="topbar">
+            <h1>{{ property.address }}</h1>
+            <p><a href="/clients/{{ property.client.id }}">{{ property.client.name }}</a></p>
+            <div class="quick-links">
+                <a href="/clients/{{ property.client.id }}">Client</a>
+                <a href="/properties/{{ property.id }}/pdf">Download PDF Report</a>
+                <a href="/properties/{{ property.id }}/service-stop/new">New Service Stop</a>
+            </div>
+        </header>
+
+        <section class="card">
+            <h2>Property Costing Snapshot</h2>
+            <div class="money-grid">
+                <div class="money-box"><strong>Total Jobs</strong><br>{{ property_job_count }}</div>
+                <div class="money-box"><strong>Total Revenue</strong><br>{{ money(property_revenue) }}</div>
+                <div class="money-box"><strong>Total Cost</strong><br>{{ money(property_cost) }}</div>
+                <div class="money-box"><strong>Total Profit</strong><br>{{ money(property_profit_value) }}</div>
+                <div class="money-box"><strong>Avg Margin</strong><br>{{ "%.1f"|format(property_margin_value) }}%</div>
+            </div>
+        </section>
+
+        <section class="card section-gap">
+            <h2>Recent Service Stops</h2>
+            {% if property.service_stops %}
+                <ul class="list">
+                    {% for stop in property.service_stops %}
+                        <li class="list-row">
+                            <strong><a href="/service-stops/{{ stop.id }}">{{ stop.date or "No date" }} - {{ stop.tech_name or "No tech" }}</a></strong><br>
+                            <span>Problem: {{ stop.problem_reported }}</span><br>
+                            <span>Billed: {{ money(stop.billed_amount or 0) }}</span><br>
+                            <span>Labor Hours: {{ stop.labor_hours or 0 }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No service stops yet.</p>
+            {% endif %}
+        </section>
+
+        <div class="grid two">
+            <section class="card">
+                <h2>Equipment</h2>
+                <form method="post" action="/properties/{{ property.id }}/equipment/update" class="form-stack">
+                    <label>Pump</label>
+                    <input type="text" name="pump" value="{{ property.pump or '' }}">
+
+                    <label>Filter</label>
+                    <input type="text" name="filter" value="{{ property.filter or '' }}">
+
+                    <label>Heater</label>
+                    <input type="text" name="heater" value="{{ property.heater or '' }}">
+
+                    <label>Sanitizer</label>
+                    <input type="text" name="sanitizer" value="{{ property.sanitizer or '' }}">
+
+                    <label>Automation</label>
+                    <input type="text" name="automation" value="{{ property.automation or '' }}">
+
+                    <label>Cleaner</label>
+                    <input type="text" name="cleaner" value="{{ property.cleaner or '' }}">
+
+                    <label>Cover Type</label>
+                    <input type="text" name="cover_type" value="{{ property.cover_type or '' }}">
+
+                    <label>Install Year</label>
+                    <input type="text" name="install_year" value="{{ property.install_year or '' }}">
+
+                    <label>Cover Notes</label>
+                    <textarea name="cover_notes">{{ property.cover_notes or '' }}</textarea>
+
+                    <label>Equipment Notes</label>
+                    <textarea name="equipment_notes">{{ property.equipment_notes or '' }}</textarea>
+
+                    <button type="submit">Save Equipment</button>
+                </form>
+            </section>
+
+            <section class="card">
+                <h2>Add Job Record + Costing</h2>
+                <form method="post" action="/properties/{{ property.id }}/jobs/add" class="form-stack">
+                    <label>Date</label>
+                    <input type="date" name="date">
+
+                    <label>Description</label>
+                    <textarea name="description" required></textarea>
+
+                    <label>Quoted Price</label>
+                    <input type="number" step="0.01" name="quoted_price" value="0">
+
+                    <label>Labor Cost</label>
+                    <input type="number" step="0.01" name="labor_cost" value="0">
+
+                    <label>Material Cost</label>
+                    <input type="number" step="0.01" name="material_cost" value="0">
+
+                    <label>Subcontractor Cost</label>
+                    <input type="number" step="0.01" name="subcontractor_cost" value="0">
+
+                    <label>Other Cost</label>
+                    <input type="number" step="0.01" name="other_cost" value="0">
+
+                    <button type="submit">Add Job</button>
+                </form>
+            </section>
+        </div>
+
+        <div class="grid two">
+            <section class="card">
+                <h2>Upload Property File</h2>
+                <form method="post" action="/properties/{{ property.id }}/files/add" enctype="multipart/form-data" class="form-stack">
+                    <label>Select File</label>
+                    <input type="file" name="upload" required>
+
+                    <label>Category</label>
+                    <select name="category">
+                        <option value="before">Before</option>
+                        <option value="after">After</option>
+                        <option value="general">General</option>
+                    </select>
+
+                    <label>Notes</label>
+                    <textarea name="notes"></textarea>
+
+                    <button type="submit">Upload</button>
+                </form>
+            </section>
+
+            <section class="card">
+                <h2>Summary</h2>
+                <div class="money-grid">
+                    <div class="money-box"><strong>Pool Type</strong><br>{{ property.pool_type or "Not set" }}</div>
+                    <div class="money-box"><strong>Pump</strong><br>{{ property.pump or "Not set" }}</div>
+                    <div class="money-box"><strong>Filter</strong><br>{{ property.filter or "Not set" }}</div>
+                    <div class="money-box"><strong>Heater</strong><br>{{ property.heater or "Not set" }}</div>
+                    <div class="money-box"><strong>Sanitizer</strong><br>{{ property.sanitizer or "Not set" }}</div>
+                    <div class="money-box"><strong>Automation</strong><br>{{ property.automation or "Not set" }}</div>
+                </div>
+            </section>
+        </div>
+
+        <section class="card section-gap">
+            <h2>Before Photos</h2>
+            <div class="photo-grid">
+                {% for file in property.files if file.category == "before" and file.file_type.startswith("image") %}
+                    <div class="photo-card">
+                        <a href="/uploads/{{ file.stored_name }}" target="_blank">
+                            <img src="/uploads/{{ file.stored_name }}" alt="{{ file.original_name }}">
+                        </a>
+                        <strong>{{ file.original_name }}</strong><br>
+                        {% if file.notes %}<span>{{ file.notes }}</span>{% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="card section-gap">
+            <h2>After Photos</h2>
+            <div class="photo-grid">
+                {% for file in property.files if file.category == "after" and file.file_type.startswith("image") %}
+                    <div class="photo-card">
+                        <a href="/uploads/{{ file.stored_name }}" target="_blank">
+                            <img src="/uploads/{{ file.stored_name }}" alt="{{ file.original_name }}">
+                        </a>
+                        <strong>{{ file.original_name }}</strong><br>
+                        {% if file.notes %}<span>{{ file.notes }}</span>{% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="card section-gap">
+            <h2>General Files</h2>
+            {% if property.files %}
+                <ul class="list">
+                    {% for file in property.files if file.category == "general" or not file.file_type.startswith("image") %}
+                        <li class="list-row">
+                            <a href="/uploads/{{ file.stored_name }}" target="_blank">{{ file.original_name }}</a><br>
+                            {% if file.notes %}<span>{{ file.notes }}</span>{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No files yet.</p>
+            {% endif %}
+        </section>
+
+        <section class="card section-gap">
+            <h2>Job History + Costing</h2>
+            {% if property.jobs %}
+                <ul class="list">
+                    {% for job in property.jobs %}
+                        <li class="list-row">
+                            {% if job.date %}<strong>{{ job.date }}</strong><br>{% endif %}
+                            <span>{{ job.description }}</span>
+
+                            <div class="money-grid" style="margin-top:12px;">
+                                <div class="money-box"><strong>Quoted</strong><br>{{ money(job.quoted_price or 0) }}</div>
+                                <div class="money-box"><strong>Labor</strong><br>{{ money(job.labor_cost or 0) }}</div>
+                                <div class="money-box"><strong>Materials</strong><br>{{ money(job.material_cost or 0) }}</div>
+                                <div class="money-box"><strong>Subs</strong><br>{{ money(job.subcontractor_cost or 0) }}</div>
+                                <div class="money-box"><strong>Other</strong><br>{{ money(job.other_cost or 0) }}</div>
+                                <div class="money-box"><strong>Total Cost</strong><br>{{ money(job_total_cost(job)) }}</div>
+                                <div class="money-box"><strong>Profit</strong><br>{{ money(job_profit(job)) }}</div>
+                                <div class="money-box"><strong>Margin</strong><br>{{ "%.1f"|format(job_margin(job)) }}%</div>
+                            </div>
+
+                            <div style="margin-top:12px;">
+                                <form method="post" action="/jobs/{{ job.id }}/files/add" enctype="multipart/form-data" class="form-stack">
+                                    <label>Attach File</label>
+                                    <input type="file" name="upload" required>
+
+                                    <label>Category</label>
+                                    <select name="category">
+                                        <option value="before">Before</option>
+                                        <option value="after">After</option>
+                                        <option value="general">General</option>
+                                    </select>
+
+                                    <textarea name="notes"></textarea>
+                                    <button type="submit">Upload Job File</button>
+                                </form>
+                            </div>
+
+                            <div style="margin-top:12px;">
+                                <strong>Files</strong>
+                                {% if job.files %}
+                                    <ul class="list">
+                                        {% for file in job.files %}
+                                            <li class="list-row">
+                                                <a href="/uploads/{{ file.stored_name }}" target="_blank">{{ file.original_name }}</a><br>
+                                                <span>Category: {{ file.category }}</span><br>
+                                                {% if file.notes %}<span>{{ file.notes }}</span>{% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>No files attached yet.</p>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No job history yet.</p>
+            {% endif %}
+        </section>
+    </div>
+
+    <nav class="mobile-actions">
+        <a href="/">Home</a>
+        <a href="/schedule">Schedule</a>
+    </nav>
+</body>
+</html>
