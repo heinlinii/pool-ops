@@ -1,9 +1,23 @@
-<!DOCTYPE html>
+<<h2 style="color:red;">NEW VERSION LOADED</h2>
+!DOCTYPE html>
 <html>
 <head>
     <title>New Service Stop</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=70">
+    <link rel="stylesheet" href="/static/styles.css?v=90">
+    <style>
+        .section-gap {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid #e6e9ed;
+        }
+
+        .helper {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+    </style>
 </head>
 <body>
     <div class="page">
@@ -16,62 +30,92 @@
         </header>
 
         <section class="card">
-            <form method="post" action="/properties/{{ property.id }}/service-stop/new" class="form-stack">
-                <label>Date</label>
-                <input type="date" name="date_value">
+            <form method="post" action="/properties/{{ property.id }}/service-stop/new" enctype="multipart/form-data" class="form-stack">
 
-                <label>Tech Name</label>
-                <input type="text" name="tech_name" placeholder="Mike">
+                <h2>1. Before Photos</h2>
+                <label>Take / Upload Before Photos</label>
+                <input type="file" name="before_photos" accept="image/*" capture="environment" multiple>
+                <p class="helper">On your phone, this should let you use the camera directly.</p>
 
-                <label>Problem Reported</label>
-                <textarea name="problem_reported" required></textarea>
+                <div class="section-gap">
+                    <h2>2. Service Details</h2>
 
-                <label>Work Performed</label>
-                <textarea name="work_performed" required></textarea>
+                    <label>Date</label>
+                    <input type="date" name="date_value">
 
-                <label>Recommendation / Next Step</label>
-                <textarea name="recommendation"></textarea>
+                    <label>Tech Name</label>
+                    <input type="text" name="tech_name" placeholder="Mike">
 
-                <label>Service Charge</label>
-                <input type="number" step="0.01" name="billed_amount" value="0">
+                    <label>Problem Reported</label>
+                    <textarea name="problem_reported" required></textarea>
 
-                <label>Labor Hours</label>
-                <input type="number" step="0.1" name="labor_hours" value="0">
+                    <label>Work Performed</label>
+                    <textarea name="work_performed" required></textarea>
 
-                <label>Material Cost</label>
-                <input type="number" step="0.01" name="material_cost" value="0">
+                    <label>Recommendation / Next Step</label>
+                    <textarea name="recommendation"></textarea>
+                </div>
 
-                <label>Trip Charge</label>
-                <input type="number" step="0.01" name="trip_charge" value="0">
+                <div class="section-gap">
+                    <h2>3. Billing</h2>
 
-                <label>Tax</label>
-                <input type="number" step="0.01" name="tax" value="0">
+                    <label>Service Charge</label>
+                    <input type="number" step="0.01" name="billed_amount" value="0">
 
-                <label>Paid Status</label>
-                <select name="paid_status">
-                    <option value="unpaid">Unpaid</option>
-                    <option value="paid">Paid</option>
-                </select>
+                    <label>Labor Hours</label>
+                    <input type="number" step="0.1" name="labor_hours" value="0">
 
-                <label>Invoice Notes</label>
-                <textarea name="invoice_notes" placeholder="Customer wants emailed invoice, paid by check, etc."></textarea>
+                    <label>Material Cost</label>
+                    <input type="number" step="0.01" name="material_cost" value="0">
 
-                <label>Create Follow-up Task?</label>
-                <select name="create_followup_task">
-                    <option value="false">No</option>
-                    <option value="true">Yes</option>
-                </select>
+                    <label>Trip Charge</label>
+                    <input type="number" step="0.01" name="trip_charge" value="0">
 
-                <label>Follow-up Task Title</label>
-                <input type="text" name="followup_title" placeholder="Return to recheck cover">
+                    <label>Tax</label>
+                    <input type="number" step="0.01" name="tax" value="0">
 
-                <label>Follow-up Due Date</label>
-                <input type="date" name="followup_due_date">
+                    <label>Paid Status</label>
+                    <select name="paid_status">
+                        <option value="unpaid">Unpaid</option>
+                        <option value="paid">Paid</option>
+                    </select>
 
-                <label>Assign Follow-up To</label>
-                <input type="text" name="followup_assigned_to" placeholder="Mike">
+                    <label>Invoice Notes</label>
+                    <textarea name="invoice_notes" placeholder="Customer wants emailed invoice, paid by check, etc."></textarea>
+                </div>
 
-                <button type="submit">Save Service Stop</button>
+                <div class="section-gap">
+                    <h2>4. After Photos</h2>
+
+                    <label>Take / Upload After Photos</label>
+                    <input type="file" name="after_photos" accept="image/*" capture="environment" multiple>
+
+                    <label>Other Files</label>
+                    <input type="file" name="general_files" multiple>
+                </div>
+
+                <div class="section-gap">
+                    <h2>5. Follow-up Task</h2>
+
+                    <label>Create Follow-up Task?</label>
+                    <select name="create_followup_task">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+
+                    <label>Follow-up Task Title</label>
+                    <input type="text" name="followup_title" placeholder="Return to recheck cover">
+
+                    <label>Follow-up Due Date</label>
+                    <input type="date" name="followup_due_date">
+
+                    <label>Assign Follow-up To</label>
+                    <input type="text" name="followup_assigned_to" placeholder="Mike">
+                </div>
+
+                <div class="section-gap">
+                    <button type="submit">Save Service Stop</button>
+                </div>
             </form>
         </section>
     </div>
