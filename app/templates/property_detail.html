@@ -7,22 +7,18 @@
 
 <h1>{{ property.address }}</h1>
 
-<p>Client: {{ property.client.name }}</p>
-
-<a href="/properties/{{ property.id }}/service-stop/new">
-    ➕ New Service Stop
-</a>
+<a href="/">Back</a>
 
 <h2>Service Stops</h2>
 
+<a href="/properties/{{ property.id }}/service-stop/new">New Service Stop</a>
+
 <ul>
-    {% for stop in property.service_stops %}
-        <li>
-            <a href="/service-stops/{{ stop.id }}">
-                {{ stop.date }} - {{ stop.tech_name }}
-            </a>
-        </li>
-    {% endfor %}
+{% for s in property.service_stops %}
+    <li>
+        {{ s.date }} - {{ s.problem_reported }}
+    </li>
+{% endfor %}
 </ul>
 
 </body>

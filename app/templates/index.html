@@ -5,23 +5,16 @@
 </head>
 <body>
 
-<h1>Clients</h1>
+<h1>Properties</h1>
+
+<a href="/properties/new">Add Property</a>
 
 <ul>
-    {% for client in clients %}
-        <li>
-            {{ client.name }}
-            <ul>
-                {% for prop in client.properties %}
-                    <li>
-                        <a href="/properties/{{ prop.id }}">
-                            {{ prop.address }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </li>
-    {% endfor %}
+{% for p in properties %}
+    <li>
+        <a href="/properties/{{ p.id }}">{{ p.address }}</a>
+    </li>
+{% endfor %}
 </ul>
 
 </body>
