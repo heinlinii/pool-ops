@@ -149,4 +149,22 @@ class FileAttachment(Base):
 
     property = relationship("Property", back_populates="files")
     job = relationship("Job", back_populates="files")
+    service_stop = relationship("ServiceStop", back_populates="files")from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text
+from sqlalchemy.orm import relationship
+from .db import Base
+
+
+class FileAttachment(Base):
+    __tablename__ = "file_attachments"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    original_name = Column(String)
+    stored_name = Column(String)
+    file_type = Column(String)
+    notes = Column(Text)
+    category = Column(String)
+
+    service_stop_id = Column(Integer, ForeignKey("service_stops.id"))
+
     service_stop = relationship("ServiceStop", back_populates="files")

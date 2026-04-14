@@ -3,7 +3,7 @@
 <head>
     <title>New Service Stop</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=999">
+    <link rel="stylesheet" href="/static/styles.css?v=1000">
 </head>
 <body>
 
@@ -11,75 +11,56 @@
     NEW VERSION LOADED
 </div>
 
-<div class="page">
-    <header class="topbar">
-        <h1>New Service Stop</h1>
-        <p>{{ property.address }}</p>
-        <div class="quick-links">
-            <a href="/properties/{{ property.id }}">Back to Property</a>
-        </div>
-    </header>
+<h1>New Service Stop</h1>
+<p>{{ property.address }}</p>
 
-    <section class="card">
-        <form method="post" enctype="multipart/form-data" class="form-stack">
-            <h2>1. Before Photos</h2>
-            <label>Take / Upload Before Photos</label>
-            <input type="file" name="before_photos" accept="image/*" capture="environment" multiple>
+<form method="post" enctype="multipart/form-data">
 
-            <h2>2. Service Details</h2>
+    <h2>Before Photos</h2>
+    <input type="file" name="before_photos" accept="image/*" capture="environment" multiple>
 
-            <label>Date</label>
-            <input type="date" name="date_value">
+    <h2>Details</h2>
 
-            <label>Tech Name</label>
-            <input type="text" name="tech_name" value="Mike">
+    <label>Date</label>
+    <input type="date" name="date_value">
 
-            <label>Problem Reported</label>
-            <textarea name="problem_reported"></textarea>
+    <label>Tech Name</label>
+    <input type="text" name="tech_name">
 
-            <label>Work Performed</label>
-            <textarea name="work_performed"></textarea>
+    <label>Problem</label>
+    <textarea name="problem_reported"></textarea>
 
-            <label>Recommendation / Next Step</label>
-            <textarea name="recommendation"></textarea>
+    <label>Work</label>
+    <textarea name="work_performed"></textarea>
 
-            <h2>3. Billing</h2>
+    <label>Recommendation</label>
+    <textarea name="recommendation"></textarea>
 
-            <label>Service Charge</label>
-            <input type="number" step="0.01" name="billed_amount" value="0">
+    <h2>Billing</h2>
 
-            <label>Labor Hours</label>
-            <input type="number" step="0.1" name="labor_hours" value="0">
+    <input type="number" step="0.01" name="billed_amount" placeholder="Service Charge">
+    <input type="number" step="0.1" name="labor_hours" placeholder="Labor Hours">
+    <input type="number" step="0.01" name="material_cost" placeholder="Material Cost">
+    <input type="number" step="0.01" name="trip_charge" placeholder="Trip Charge">
+    <input type="number" step="0.01" name="tax" placeholder="Tax">
 
-            <label>Material Cost</label>
-            <input type="number" step="0.01" name="material_cost" value="0">
+    <select name="paid_status">
+        <option value="unpaid">Unpaid</option>
+        <option value="paid">Paid</option>
+    </select>
 
-            <label>Trip Charge</label>
-            <input type="number" step="0.01" name="trip_charge" value="0">
+    <textarea name="invoice_notes" placeholder="Notes"></textarea>
 
-            <label>Tax</label>
-            <input type="number" step="0.01" name="tax" value="0">
+    <h2>After Photos</h2>
+    <input type="file" name="after_photos" accept="image/*" capture="environment" multiple>
 
-            <label>Paid Status</label>
-            <select name="paid_status">
-                <option value="unpaid">Unpaid</option>
-                <option value="paid">Paid</option>
-            </select>
+    <h2>Other Files</h2>
+    <input type="file" name="general_files" multiple>
 
-            <label>Invoice Notes</label>
-            <textarea name="invoice_notes" placeholder="Customer wants emailed invoice, paid by check, etc."></textarea>
+    <br><br>
+    <button type="submit">Save</button>
 
-            <h2>4. After Photos</h2>
-            <label>Take / Upload After Photos</label>
-            <input type="file" name="after_photos" accept="image/*" capture="environment" multiple>
-
-            <label>Other Files</label>
-            <input type="file" name="general_files" multiple>
-
-            <button type="submit">Save Service Stop</button>
-        </form>
-    </section>
-</div>
+</form>
 
 </body>
 </html>
