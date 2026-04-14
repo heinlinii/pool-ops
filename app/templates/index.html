@@ -2,20 +2,37 @@
 <html>
 <head>
     <title>Pool Ops</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/styles.css?v=2000">
 </head>
 <body>
+    <div class="page">
+        <header class="topbar">
+            <h1>Properties</h1>
+            <p>Field dashboard for service stops and job records.</p>
+            <div class="quick-links">
+                <a href="/properties/new" class="button-link">Add Property</a>
+            </div>
+        </header>
 
-<h1>Properties</h1>
+        <section class="card">
+            <h2>All Properties</h2>
 
-<a href="/properties/new">Add Property</a>
-
-<ul>
-{% for p in properties %}
-    <li>
-        <a href="/properties/{{ p.id }}">{{ p.address }}</a>
-    </li>
-{% endfor %}
-</ul>
-
+            {% if properties %}
+                <div class="list">
+                    {% for p in properties %}
+                        <div class="list-item">
+                            <a href="/properties/{{ p.id }}">{{ p.address }}</a>
+                            {% if p.client %}
+                                <div class="muted">Client: {{ p.client.name }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted">No properties yet.</p>
+            {% endif %}
+        </section>
+    </div>
 </body>
 </html>

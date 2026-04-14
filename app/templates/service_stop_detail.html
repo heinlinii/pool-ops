@@ -3,123 +3,80 @@
 <head>
     <title>Service Stop</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=80">
-    <style>
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px;
-        }
-
-        .photo-card {
-            border: 1px solid #e6e9ed;
-            border-radius: 10px;
-            padding: 10px;
-            background: #fafbfc;
-        }
-
-        .photo-card img {
-            width: 100%;
-            height: 140px;
-            object-fit: cover;
-            border-radius: 8px;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .money-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 10px;
-        }
-
-        .money-box {
-            background: #fafbfc;
-            border: 1px solid #e6e9ed;
-            border-radius: 10px;
-            padding: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/styles.css?v=2000">
 </head>
 <body>
     <div class="page">
         <header class="topbar">
             <h1>Service Stop</h1>
-            <p>{{ service_stop.property.address }}</p>
+            <p>
+                {{ service_stop.property.address if service_stop.property else "No property" }}
+            </p>
             <div class="quick-links">
-                <a href="/properties/{{ service_stop.property.id }}">Property</a>
-                <a href="/clients/{{ service_stop.property.client.id }}">Client</a>
-                <a href="/service-stops/{{ service_stop.id }}/pdf">Download PDF Report</a>
-                <a href="/service-stops/{{ service_stop.id }}/quickbooks-invoice.csv">QuickBooks Invoice CSV</a>
+                {% if service_stop.property %}
+                    <a href="/properties/{{ service_stop.property.id }}" class="button-link">Back to Property</a>
+                {% endif %}
+                <a href="/export/service-stops" class="button-link">Export CSV</a>
             </div>
         </header>
 
-        <section class="card">
-            <p><strong>Date:</strong> {{ service_stop.date or "Not set" }}</p>
-            <p><strong>Tech:</strong> {{ service_stop.tech_name or "Not set" }}</p>
-            <p><strong>Problem Reported:</strong><br>{{ service_stop.problem_reported or "None" }}</p>
-            <p><strong>Work Performed:</strong><br>{{ service_stop.work_performed or "None" }}</p>
-            <p><strong>Recommendation:</strong><br>{{ service_stop.recommendation or "None" }}</p>
-        </section>
-
-        <section class="card">
-            <h2>Billing Summary</h2>
-            <div class="money-grid">
-                <div class="money-box"><strong>Service Charge</strong><br>{{ money(service_stop.billed_amount or 0) }}</div>
-                <div class="money-box"><strong>Material Cost</strong><br>{{ money(service_stop.material_cost or 0) }}</div>
-                <div class="money-box"><strong>Trip Charge</strong><br>{{ money(service_stop.trip_charge or 0) }}</div>
-                <div class="money-box"><strong>Tax</strong><br>{{ money(service_stop.tax or 0) }}</div>
-                <div class="money-box"><strong>Invoice Total</strong><br>{{ money(service_stop_total(service_stop)) }}</div>
-                <div class="money-box"><strong>Paid Status</strong><br>{{ service_stop.paid_status or "unpaid" }}</div>
-                <div class="money-box"><strong>Labor Hours</strong><br>{{ service_stop.labor_hours or 0 }}</div>
+        <div class="kpi-row">
+            <div class="kpi">
+                <div class="kpi-label">Date</div>
+                <div class="kpi-value" style="font-size:20px;">{{ service_stop.date or "-" }}</div>
             </div>
+            <div class="kpi">
+                <div class="kpi-label">Tech</div>
+                <div class="kpi-value" style="font-size:20px;">{{ service_stop.tech_name or "-" }}</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi-label">Paid Status</div>
+                <div class="kpi-value" style="font-size:20px;">{{ service_stop.paid_status or "-" }}</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi-label">Invoice Total</div>
+                <div class="kpi-value" style="font-size:20px;">${{ "%.2f"|format(invoice_total) }}</div>
+            </div>
+        </div>
 
-            {% if service_stop.invoice_notes %}
-                <p style="margin-top: 12px;"><strong>Invoice Notes:</strong><br>{{ service_stop.invoice_notes }}</p>
-            {% endif %}
-        </section>
+        <div class="grid two" style="margin-top:20px;">
+            <section class="card">
+                <h2>Problem Reported</h2>
+                <p>{{ service_stop.problem_reported or "None entered." }}</p>
 
-        <section class="card">
-            <h2>Upload Stop Photos / Files</h2>
-            <form method="post" action="/service-stops/{{ service_stop.id }}/files/add" enctype="multipart/form-data" class="form-stack">
-                <label>Select File</label>
-                <input type="file" name="upload" required>
+                <h2 class="section-gap">Work Performed</h2>
+                <p>{{ service_stop.work_performed or "None entered." }}</p>
 
-                <label>Category</label>
-                <select name="category">
-                    <option value="before">Before</option>
-                    <option value="after">After</option>
-                    <option value="general">General</option>
-                </select>
+                <h2 class="section-gap">Recommendation</h2>
+                <p>{{ service_stop.recommendation or "None entered." }}</p>
+            </section>
 
-                <label>Notes</label>
-                <textarea name="notes"></textarea>
-
-                <button type="submit">Upload File</button>
-            </form>
-        </section>
-
-        <section class="card">
-            <h2>Attached Files</h2>
-            {% if service_stop.files %}
-                <div class="photo-grid">
-                    {% for file in service_stop.files %}
-                        <div class="photo-card">
-                            {% if file.file_type.startswith("image") %}
-                                <a href="/uploads/{{ file.stored_name }}" target="_blank">
-                                    <img src="/uploads/{{ file.stored_name }}" alt="{{ file.original_name }}">
-                                </a>
-                            {% else %}
-                                <a href="/uploads/{{ file.stored_name }}" target="_blank">{{ file.original_name }}</a>
-                            {% endif %}
-                            <strong>{{ file.original_name }}</strong><br>
-                            <span>Category: {{ file.category }}</span><br>
-                            {% if file.notes %}<span>{{ file.notes }}</span>{% endif %}
-                        </div>
-                    {% endfor %}
+            <section class="card">
+                <h2>Billing</h2>
+                <div class="list">
+                    <div class="list-item">Service Charge: ${{ "%.2f"|format(service_stop.billed_amount or 0) }}</div>
+                    <div class="list-item">Labor Hours: {{ service_stop.labor_hours or 0 }}</div>
+                    <div class="list-item">Material Cost: ${{ "%.2f"|format(service_stop.material_cost or 0) }}</div>
+                    <div class="list-item">Trip Charge: ${{ "%.2f"|format(service_stop.trip_charge or 0) }}</div>
+                    <div class="list-item">Tax: ${{ "%.2f"|format(service_stop.tax or 0) }}</div>
                 </div>
+
+                <h2 class="section-gap">Invoice Notes</h2>
+                <p>{{ service_stop.invoice_notes or "None entered." }}</p>
+            </section>
+        </div>
+
+        <section class="card" style="margin-top:20px;">
+            <h2>Attachments</h2>
+
+            {% if service_stop.files %}
+                {% for f in service_stop.files %}
+                    <a class="file-pill" href="/uploads/{{ f.stored_name }}" target="_blank">
+                        {{ f.category or "file" }} — {{ f.original_name }}
+                    </a>
+                {% endfor %}
             {% else %}
-                <p>No files attached yet.</p>
+                <p class="muted">No files attached.</p>
             {% endif %}
         </section>
     </div>
