@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi import FastAPI, Request, Depends, HTTPException, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session, joinedload
@@ -42,7 +42,17 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
 
 
 # -----------------------
-# PROPERTY DETAIL
+@app.get("/properties/new", response_class=HTMLResponse)
+def new_property(request: Request, db: Session = Depends(get_db)):
+    clients = db.query(Client).order_by(Client.name.asc()).all()
+
+    return templates.TemplateResponse(
+        request,
+        "property_new.html",
+        {
+            "clients": clients,
+        },
+    )
 # -----------------------
 @app.get("/properties/{property_id}", response_class=HTMLResponse)
 def property_detail(request: Request, property_id: int, db: Session = Depends(get_db)):
@@ -131,7 +141,63 @@ def service_stop_detail(request: Request, service_stop_id: int, db: Session = De
 
 
 # -----------------------
-# SEED DATA
+# SEED @app.get("/properties/new", response_class=HTMLResponse)
+def new_property(request: Request, db: Session = Depends(get_db)):
+    clients = db.query(Client).order_by(Client.name.asc()).all()
+
+    return templates.TemplateResponse(
+        request,
+        "property_new.html",
+        {
+            "clients": clients,
+        },
+    )
+
+
+@app.post("/properties/new")
+def create_property(
+    client_id: str = Form(""),
+    client_name: str = Form(""),
+    client_phone: str = Form(""),
+    client_email: str = Form(""),
+    address: str = Form(""),
+    pool_type: str = Form(""),
+    notes: str = Form(""),
+    db: Session = Depends(get_db),
+):
+    if not address.strip():
+        raise HTTPException(status_code=400, detail="Property address is required")
+
+    selected_client = None
+
+    if client_id.strip():
+        selected_client = db.query(Client).filter(Client.id == int(client_id)).first()
+
+    if not selected_client:
+        if not client_name.strip():
+            raise HTTPException(status_code=400, detail="Client name is required if no existing client is selected")
+
+        selected_client = Client(
+            name=client_name.strip(),
+            phone=client_phone.strip(),
+            email=client_email.strip(),
+        )
+        db.add(selected_client)
+        db.commit()
+        db.refresh(selected_client)
+
+    prop = Property(
+        address=address.strip(),
+        pool_type=pool_type.strip(),
+        notes=notes.strip(),
+        client_id=selected_client.id,
+    )
+
+    db.add(prop)
+    db.commit()
+    db.refresh(prop)
+
+    return RedirectResponse(url=f"/properties/{prop.id}", status_code=303)DATA
 # -----------------------
 @app.get("/dev/seed")
 def seed(db: Session = Depends(get_db)):
