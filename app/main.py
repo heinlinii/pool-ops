@@ -103,7 +103,13 @@ def create_property(
     db.refresh(prop)
 
     return RedirectResponse(url=f"/properties/{prop.id}", status_code=303)
-
+@app@app.get("/", response_class=HTMLResponse)
+def home(request: Request, db: Session = Depends(get_db)):
+    properties = db.query(Property).all()
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "properties": properties
+    }).get("/")
 
 @app.get("/properties/{property_id}", response_class=HTMLResponse)
 def property_detail(request: Request, property_id: int, db: Session = Depends(get_db)):
@@ -226,4 +232,3 @@ def seed(db: Session = Depends(get_db)):
     db.add(stop)
     db.commit()
 
-    return {"status": "seeded"}
