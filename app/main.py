@@ -17,6 +17,8 @@ app.mount("/uploads", StaticFiles(directory="app/uploads"), name="uploads")
 templates = Jinja2Templates(directory="app/templates")
 
 
+# ---------------- DB ---------------- #
+
 def get_db():
     db = SessionLocal()
     try:
@@ -24,6 +26,8 @@ def get_db():
     finally:
         db.close()
 
+
+# ---------------- HOME ---------------- #
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request, db: Session = Depends(get_db)):
@@ -35,22 +39,24 @@ def home(request: Request, db: Session = Depends(get_db)):
     )
 
     return templates.TemplateResponse(
-        request,
         "index.html",
         {
+            "request": request,
             "properties": properties,
         },
     )
 
+
+# ---------------- NEW PROPERTY ---------------- #
 
 @app.get("/properties/new", response_class=HTMLResponse)
 def new_property(request: Request, db: Session = Depends(get_db)):
     clients = db.query(Client).order_by(Client.name.asc()).all()
 
     return templates.TemplateResponse(
-        request,
         "property_new.html",
         {
+            "request": request,
             "clients": clients,
         },
     )
@@ -103,16 +109,10 @@ def create_property(
     db.refresh(prop)
 
     return RedirectResponse(url=f"/properties/{prop.id}", status_code=303)
-@app.get("/", response_class=HTMLResponse)
-def home(request: Request, db: Session = Depends(get_db)):
-    properties = db.query(Property).all()
-    return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
-            "properties": properties,
-        },
-    )
+
+
+# ---------------- PROPERTY DETAIL ---------------- #
+
 @app.get("/properties/{property_id}", response_class=HTMLResponse)
 def property_detail(request: Request, property_id: int, db: Session = Depends(get_db)):
     prop = (
@@ -129,30 +129,27 @@ def property_detail(request: Request, property_id: int, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Property not found")
 
     return templates.TemplateResponse(
-        request,
         "property_detail.html",
         {
+            "request": request,
             "property": prop,
         },
     )
 
 
+# ---------------- SERVICE STOP ---------------- #
+
 @app.get("/properties/{property_id}/service-stop/new", response_class=HTMLResponse)
 def new_service_stop(request: Request, property_id: int, db: Session = Depends(get_db)):
-    prop = (
-        db.query(Property)
-        .options(joinedload(Property.client))
-        .filter(Property.id == property_id)
-        .first()
-    )
+    prop = db.query(Property).filter(Property.id == property_id).first()
 
     if not prop:
         raise HTTPException(status_code=404, detail="Property not found")
 
     return templates.TemplateResponse(
-        request,
         "service_stop_new.html",
         {
+            "request": request,
             "property": prop,
         },
     )
@@ -181,56 +178,10 @@ def service_stop_detail(request: Request, stop_id: int, db: Session = Depends(ge
     )
 
     return templates.TemplateResponse(
-        request,
         "service_stop_detail.html",
         {
+            "request": request,
             "service_stop": stop,
             "invoice_total": invoice_total,
         },
     )
-
-
-@app.get("/dev/seed")
-def seed(db: Session = Depends(get_db)):
-    existing_property = db.query(Property).filter(Property.address == "1234 Oak Hill Rd").first()
-    if existing_property:
-        return {"status": "already seeded"}
-
-    client = Client(
-        name="John Smith",
-        phone="812-555-1212",
-        email="john@email.com",
-    )
-    db.add(client)
-    db.commit()
-    db.refresh(client)
-
-    prop = Property(
-        address="1234 Oak Hill Rd",
-        pool_type="Gunite",
-        notes="Auto cover issue on right track.",
-        client_id=client.id,
-    )
-    db.add(prop)
-    db.commit()
-    db.refresh(prop)
-
-    stop = ServiceStop(
-        date="2026-04-12",
-        tech_name="Mike",
-        problem_reported="Customer reported cover dragging on right side.",
-        work_performed="Adjusted track, cleaned debris, tested motor.",
-        recommendation="Recheck after one week of use.",
-        billed_amount=275.00,
-        labor_hours=2.5,
-        material_cost=18.00,
-        trip_charge=35.00,
-        tax=19.04,
-        paid_status="unpaid",
-        invoice_notes="Customer requested emailed invoice.",
-        status="completed",
-        property_id=prop.id,
-    )
-    db.add(stop)
-    db.commit()
-

@@ -3,17 +3,30 @@
 <head>
     <title>Heinlin Ops</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=3001">
+    <link rel="stylesheet" href="/static/styles.css?v=4001">
 </head>
 <body>
     <div class="page">
         <header class="topbar">
-            <h1>Properties</h1>
-            <p>Field dashboard for service stops and job records.</p>
-            <div class="quick-links">
+            <h1>Heinlin Ops</h1>
+            <p>Field dashboard for service stops, properties, and job records.</p>
+
+            <div class="quick-links" style="margin-top:16px;">
                 <a href="/properties/new" class="button-link">Add Property</a>
+                <a href="/dev/seed" class="button-link">Seed Demo Data</a>
             </div>
         </header>
+
+        <section class="card">
+            <h2>Quick Actions</h2>
+            <div class="quick-links">
+                <a href="/properties/new" class="button-link">+ Add Property</a>
+                <a href="/" class="button-link">View Properties</a>
+                <a href="/properties/1" class="button-link">Open Demo Property</a>
+                <a href="/properties/1/service-stop/new" class="button-link">New Service Stop</a>
+                <a href="/service-stops/1" class="button-link">Recent Service Stop</a>
+            </div>
+        </section>
 
         <section class="card">
             <h2>All Properties</h2>
@@ -22,16 +35,52 @@
                 <div class="list">
                     {% for p in properties %}
                         <div class="list-item">
-                            <a href="/properties/{{ p.id }}">{{ p.address }}</a>
-                            {% if p.client %}
-                                <div class="muted">Client: {{ p.client.name }}</div>
-                            {% endif %}
+                            <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap;">
+                                <div>
+                                    <div style="font-weight:700; font-size:20px;">
+                                        <a href="/properties/{{ p.id }}">{{ p.address }}</a>
+                                    </div>
+                                    {% if p.client %}
+                                        <div class="muted">Client: {{ p.client.name }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="quick-links">
+                                    <a href="/properties/{{ p.id }}" class="button-link">Open</a>
+                                    <a href="/properties/{{ p.id }}/service-stop/new" class="button-link">Add Service Stop</a>
+                                </div>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
             {% else %}
                 <p class="muted">No properties yet.</p>
             {% endif %}
+        </section>
+
+        <section class="card">
+            <h2>System Shortcuts</h2>
+            <div class="list">
+                <div class="list-item">
+                    <a href="/properties/new">Create a new property</a>
+                    <div class="muted">Add address, pool type, notes, and client info.</div>
+                </div>
+
+                <div class="list-item">
+                    <a href="/properties/1">Open demo property</a>
+                    <div class="muted">Fast way to test property detail layout.</div>
+                </div>
+
+                <div class="list-item">
+                    <a href="/properties/1/service-stop/new">Create a service stop</a>
+                    <div class="muted">Use this to build out your field workflow.</div>
+                </div>
+
+                <div class="list-item">
+                    <a href="/service-stops/1">Open service stop detail</a>
+                    <div class="muted">Review job notes, billing, and history.</div>
+                </div>
+            </div>
         </section>
     </div>
 </body>
