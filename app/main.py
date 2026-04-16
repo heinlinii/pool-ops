@@ -26,7 +26,7 @@ def get_db():
 
 
 @app.get("/", response_class=HTMLResponse)
-def dashboard(request: Request, db: Session = Depends(get_db)):
+def home(request: Request, db: Session = Depends(get_db)):
     properties = (
         db.query(Property)
         .options(joinedload(Property.client))
@@ -103,14 +103,16 @@ def create_property(
     db.refresh(prop)
 
     return RedirectResponse(url=f"/properties/{prop.id}", status_code=303)
-@app@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 def home(request: Request, db: Session = Depends(get_db)):
     properties = db.query(Property).all()
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "properties": properties
-    }).get("/")
-
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "properties": properties,
+        },
+    )
 @app.get("/properties/{property_id}", response_class=HTMLResponse)
 def property_detail(request: Request, property_id: int, db: Session = Depends(get_db)):
     prop = (
