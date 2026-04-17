@@ -3,33 +3,80 @@
 <head>
     <title>Heinlin Ops</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=9101">
+    <link rel="stylesheet" href="/static/styles.css?v=9301">
 </head>
 <body>
     <div class="page">
-        <h1>Heinlin Ops</h1>
-        <p>Field dashboard for service stops and job records.</p>
+        <header class="hero">
+            <div>
+                <h1>Heinlin Ops</h1>
+                <p>Field dashboard for service stops, properties, and job records.</p>
+            </div>
 
-        <p><a class="button-link" href="/properties/new">Add Property</a></p>
+            <div class="hero-actions">
+                <a href="/properties/new" class="button-link">Add Property</a>
+                <a href="/dev/seed" class="button-link secondary">Seed Demo</a>
+            </div>
+        </header>
 
-        <div class="card">
-            <h2>All Properties</h2>
+        <section class="card">
+            <h2>Quick Actions</h2>
+            <div class="quick-grid">
+                <a class="quick-tile" href="/properties/new">
+                    <div class="quick-title">Add Property</div>
+                    <div class="quick-sub">Create a new property record.</div>
+                </a>
+
+                <a class="quick-tile" href="/properties/1">
+                    <div class="quick-title">Open Demo Property</div>
+                    <div class="quick-sub">Jump into the seeded property.</div>
+                </a>
+
+                <a class="quick-tile" href="/properties/1/service-stop/new">
+                    <div class="quick-title">New Service Stop</div>
+                    <div class="quick-sub">Start a job visit entry.</div>
+                </a>
+
+                <a class="quick-tile" href="/service-stops/1">
+                    <div class="quick-title">Service Stop Detail</div>
+                    <div class="quick-sub">Review the seeded stop.</div>
+                </a>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="section-head">
+                <h2>All Properties</h2>
+                <span class="badge">{{ properties|length }} total</span>
+            </div>
 
             {% if properties %}
-                <ul>
-                {% for p in properties %}
-                    <li style="margin-bottom: 10px;">
-                        <a href="/properties/{{ p.id }}">{{ p.address }}</a>
-                        <div class="muted">
-                            Client: {{ p.client.name if p.client else "—" }}
+                <div class="property-list">
+                    {% for p in properties %}
+                        <div class="property-card">
+                            <div class="property-main">
+                                <div class="property-address">
+                                    <a href="/properties/{{ p.id }}">{{ p.address }}</a>
+                                </div>
+                                <div class="muted">
+                                    Client: {{ p.client.name if p.client else "—" }}
+                                </div>
+                            </div>
+
+                            <div class="property-actions">
+                                <a href="/properties/{{ p.id }}" class="button-link small">Open</a>
+                                <a href="/properties/{{ p.id }}/service-stop/new" class="button-link secondary small">Add Stop</a>
+                            </div>
                         </div>
-                    </li>
-                {% endfor %}
-                </ul>
+                    {% endfor %}
+                </div>
             {% else %}
-                <p>No properties yet.</p>
+                <div class="empty-state">
+                    <p>No properties yet.</p>
+                    <a href="/properties/new" class="button-link">Create First Property</a>
+                </div>
             {% endif %}
-        </div>
+        </section>
     </div>
 </body>
 </html>
