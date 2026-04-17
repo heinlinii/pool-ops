@@ -1,264 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Schedule - Pool Ops</title>
-    <link rel="stylesheet" href="/static/styles.css?v=30">
-    <style>
-        .status-pill {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .status-open { background: #fff3cd; color: #7a5a00; }
-        .status-in-progress { background: #dbeafe; color: #1d4ed8; }
-        .status-done { background: #dcfce7; color: #166534; }
-
-        .overdue-banner {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .task-actions {
-            margin-top: 10px;
-        }
-
-        .task-actions form,
-        .task-actions a {
-            display: inline-block;
-            margin-right: 8px;
-            margin-top: 6px;
-        }
-
-        .task-actions button,
-        .edit-link {
-            padding: 8px 12px;
-            font-size: 13px;
-            border-radius: 8px;
-            text-decoration: none;
-        }
-
-        .edit-link {
-            background: #e5e7eb;
-            color: #111827;
-        }
-
-        .week-grid {
-            display: grid;
-            grid-template-columns: repeat(7, minmax(220px, 1fr));
-            gap: 16px;
-            overflow-x: auto;
-        }
-
-        .day-column {
-            background: white;
-            border-radius: 10px;
-            padding: 14px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            min-height: 220px;
-        }
-
-        .day-column.today {
-            outline: 2px solid #1f6feb;
-        }
-
-        .day-column.drag-over {
-            outline: 3px dashed #1f6feb;
-            background: #eff6ff;
-        }
-
-        .mini-task {
-            border: 1px solid #e6e9ed;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
-            background: #fafbfc;
-            cursor: grab;
-        }
-
-        .mini-task.dragging {
-            opacity: 0.5;
-        }
-    </style>
+    <title>Schedule</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/styles.css?v=9501">
 </head>
 <body>
     <div class="page">
-        <header class="topbar">
-            <h1>Schedule</h1>
-            <p>Smart reminders + daily operations</p>
-            <p><a href="/">← Back to Dashboard</a></p>
-        </header>
-
-        {% if overdue_tasks %}
-            <div class="overdue-banner">
-                {{ overdue_tasks|length }} overdue task(s) need attention.
+        <div class="app-header">
+            <div class="header-left">
+                <img src="/static/logo.png" class="logo">
+                <div>
+                    <div class="brand-title">Heinlin Ops</div>
+                    <div class="brand-sub">Schedule</div>
+                </div>
             </div>
-        {% endif %}
 
-        <section class="card">
-            <h2>This Week</h2>
-            <p>Drag a task card to another day to reschedule it.</p>
-            <div class="week-grid">
-                {% for day in week_days %}
-                    <div class="day-column {% if day.is_today %}today{% endif %}" data-date="{{ day.date_str }}">
-                        <h3>{{ day.short_label }}</h3>
+            <div class="header-actions">
+                <a href="/" class="button-link secondary small">Home</a>
+                <a href="/schedule/new" class="button-link small">Add Scheduled Job</a>
+            </div>
+        </div>
 
-                        {% if weekly_tasks[day.date_str] %}
-                            {% for task in weekly_tasks[day.date_str] %}
-                                <div class="mini-task"
-                                     draggable="true"
-                                     data-task-id="{{ task.id }}">
-                                    <span class="status-pill status-{{ task.status|lower|replace(' ', '-') }}">{{ task.status }}</span>
-                                    <strong>{{ task.title }}</strong>
-                                    {% if task.assigned_to %}<div>Assigned: {{ task.assigned_to }}</div>{% endif %}
-                                    {% if task.reminder_type %}<div>Reminder: {{ task.reminder_type }}</div>{% endif %}
-                                    {% if task.client %}<div>Client: <a href="/clients/{{ task.client.id }}">{{ task.client.name }}</a></div>{% endif %}
-                                    <div class="task-actions">
-                                        <a class="edit-link" href="/tasks/{{ task.id }}/edit">Edit</a>
-                                    </div>
+        <div class="card">
+            <div class="section-head">
+                <h2>Schedule</h2>
+                <span class="badge">{{ schedule_items|length }} total</span>
+            </div>
+
+            {% if schedule_items %}
+                <div class="property-list">
+                    {% for item in schedule_items %}
+                        <div class="property-card">
+                            <div class="property-main">
+                                <div class="property-address">
+                                    <a href="/properties/{{ item.property.id }}">
+                                        {{ item.property.address }}
+                                    </a>
                                 </div>
-                            {% endfor %}
-                        {% else %}
-                            <p>No tasks</p>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        </section>
 
-        <section class="card" style="margin-top:20px;">
-            <h2>Overdue</h2>
-            {% if overdue_tasks %}
-                <ul class="list">
-                    {% for task in overdue_tasks %}
-                        <li class="list-row">
-                            <strong>{{ task.title }}</strong><br>
-                            <span>Due: {{ task.due_date }}</span><br>
-                            {% if task.assigned_to %}<span>Assigned: {{ task.assigned_to }}</span><br>{% endif %}
-                            {% if task.reminder_type %}<span>Reminder: {{ task.reminder_type }}</span><br>{% endif %}
-                            {% if task.client %}<span>Client: <a href="/clients/{{ task.client.id }}">{{ task.client.name }}</a></span><br>{% endif %}
-                            {% if task.notes %}<span>{{ task.notes }}</span><br>{% endif %}
+                                <div class="muted">
+                                    Client: {{ item.property.client.name if item.property.client else "—" }}
+                                </div>
 
-                            <div class="task-actions">
-                                <a class="edit-link" href="/tasks/{{ task.id }}/edit">Edit</a>
-                                <form method="post" action="/tasks/{{ task.id }}/complete">
-                                    <input type="hidden" name="assigned_to" value="{{ selected_person }}">
-                                    <button type="submit">Complete</button>
-                                </form>
+                                <div class="muted">
+                                    Date: {{ item.date or "—" }}
+                                </div>
+
+                                <div class="muted">
+                                    Assigned To: {{ item.assigned_to or "—" }}
+                                </div>
+
+                                <div class="muted">
+                                    Status: {{ item.status or "—" }}
+                                </div>
+
+                                {% if item.notes %}
+                                    <div class="muted">
+                                        Notes: {{ item.notes }}
+                                    </div>
+                                {% endif %}
                             </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No overdue tasks.</p>
-            {% endif %}
-        </section>
 
-        <section class="card" style="margin-top:20px;">
-            <h2>Today ({{ today_str }})</h2>
-            {% if today_tasks %}
-                <ul class="list">
-                    {% for task in today_tasks %}
-                        <li class="list-row">
-                            <strong>{{ task.title }}</strong><br>
-                            {% if task.assigned_to %}<span>Assigned: {{ task.assigned_to }}</span><br>{% endif %}
-                            {% if task.reminder_type %}<span>Reminder: {{ task.reminder_type }}</span><br>{% endif %}
-                            {% if task.client %}<span>Client: <a href="/clients/{{ task.client.id }}">{{ task.client.name }}</a></span><br>{% endif %}
-                            {% if task.notes %}<span>{{ task.notes }}</span><br>{% endif %}
-
-                            <div class="task-actions">
-                                <a class="edit-link" href="/tasks/{{ task.id }}/edit">Edit</a>
-                                <form method="post" action="/tasks/{{ task.id }}/complete">
-                                    <input type="hidden" name="assigned_to" value="{{ selected_person }}">
-                                    <button type="submit">Complete</button>
-                                </form>
+                            <div class="property-actions">
+                                <a href="/properties/{{ item.property.id }}" class="button-link small">Open Property</a>
+                                <a href="/properties/{{ item.property.id }}/service-stop/new" class="button-link secondary small">Start Stop</a>
                             </div>
-                        </li>
+                        </div>
                     {% endfor %}
-                </ul>
+                </div>
             {% else %}
-                <p>No tasks due today.</p>
+                <div class="empty-state">
+                    <p>No scheduled jobs yet.</p>
+                    <a href="/schedule/new" class="button-link">Create First Scheduled Job</a>
+                </div>
             {% endif %}
-        </section>
-
-        <section class="card" style="margin-top:20px;">
-            <h2>Tomorrow ({{ tomorrow_str }})</h2>
-            {% if tomorrow_tasks %}
-                <ul class="list">
-                    {% for task in tomorrow_tasks %}
-                        <li class="list-row">
-                            <strong>{{ task.title }}</strong><br>
-                            {% if task.assigned_to %}<span>Assigned: {{ task.assigned_to }}</span><br>{% endif %}
-                            {% if task.reminder_type %}<span>Reminder: {{ task.reminder_type }}</span><br>{% endif %}
-                            {% if task.client %}<span>Client: <a href="/clients/{{ task.client.id }}">{{ task.client.name }}</a></span><br>{% endif %}
-                            {% if task.notes %}<span>{{ task.notes }}</span><br>{% endif %}
-
-                            <div class="task-actions">
-                                <a class="edit-link" href="/tasks/{{ task.id }}/edit">Edit</a>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No tasks due tomorrow.</p>
-            {% endif %}
-        </section>
+        </div>
     </div>
-
-    <script>
-        document.querySelectorAll('.mini-task').forEach(taskEl => {
-            taskEl.addEventListener('dragstart', (event) => {
-                taskEl.classList.add('dragging');
-                event.dataTransfer.setData('text/plain', taskEl.dataset.taskId);
-            });
-
-            taskEl.addEventListener('dragend', () => {
-                taskEl.classList.remove('dragging');
-            });
-        });
-
-        document.querySelectorAll('.day-column').forEach(dayCol => {
-            dayCol.addEventListener('dragover', (event) => {
-                event.preventDefault();
-                dayCol.classList.add('drag-over');
-            });
-
-            dayCol.addEventListener('dragleave', () => {
-                dayCol.classList.remove('drag-over');
-            });
-
-            dayCol.addEventListener('drop', async (event) => {
-                event.preventDefault();
-                dayCol.classList.remove('drag-over');
-
-                const taskId = event.dataTransfer.getData('text/plain');
-                const newDate = dayCol.dataset.date;
-
-                if (!taskId || !newDate) return;
-
-                const formData = new FormData();
-                formData.append('due_date', newDate);
-                formData.append('assigned_to', '{{ selected_person }}');
-
-                const response = await fetch(`/tasks/${taskId}/move`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    window.location.reload();
-                } else {
-                    alert('Failed to move task.');
-                }
-            });
-        });
-    </script>
 </body>
 </html>

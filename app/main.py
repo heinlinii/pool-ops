@@ -5,7 +5,7 @@ from starlette.templating import Jinja2Templates
 from sqlalchemy.orm import Session, joinedload
 
 from .db import SessionLocal, engine, Base
-from .models import Client, Property, ServiceStop
+from .models import Client, Property, ServiceStop, ScheduleItem
 
 app = FastAPI()
 
@@ -218,7 +218,69 @@ def service_stop_detail(request: Request, stop_id: int, db: Session = Depends(ge
             "invoice_total": invoice_total,
         },
     )
+@app.get("/schedule", response_class=HTMLResponse)
+def schedule_page(request: Request, db: Session = Depends(get_db)):
+    schedule_items = (
+        db.query(ScheduleItem)
+        .options(joinedload(ScheduleItem.property).joinedload(Property.client))
+        .order_by(ScheduleItem.date.asc(), ScheduleItem.id.asc())
+        .all()
+    )
 
+    return templates.TemplateResponse(
+        request,
+        "schedule.html",
+        {
+            "schedule_items": schedule_items,
+        },
+    )
+
+
+@app.get("/schedule/new", response_class=HTMLResponse)
+def new_schedule_item(request: Request, db: Session = Depends(get_db)):
+    properties = (
+        db.query(Property)
+        .options(joinedload(Property.client))
+        .order_by(Property.address.asc())
+        .all()
+    )
+
+    return templates.TemplateResponse(
+        request,
+        "schedule_new.html",
+        {
+            "properties": properties,
+        },
+    )
+
+
+@app.post("/schedule/new")
+def create_schedule_item(
+    property_id: int = Form(...),
+    date: str = Form(""),
+    assigned_to: str = Form(""),
+    status: str = Form("scheduled"),
+    notes: str = Form(""),
+    db: Session = Depends(get_db),
+):
+    prop = db.query(Property).filter(Property.id == property_id).first()
+
+    if not prop:
+        raise HTTPException(status_code=404, detail="Property not found")
+
+    item = ScheduleItem(
+        property_id=property_id,
+        date=date.strip(),
+        assigned_to=assigned_to.strip(),
+        status=status.strip() or "scheduled",
+        notes=notes.strip(),
+    )
+
+    db.add(item)
+    db.commit()
+    db.refresh(item)
+
+    return RedirectResponse(url="/schedule", status_code=303)
 
 @app.get("/dev/seed")
 def seed(db: Session = Depends(get_db)):

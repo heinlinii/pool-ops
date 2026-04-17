@@ -1,7 +1,7 @@
 <div class="card">
     <h2>Service Stops</h2>
     <p><a class="button-link" href="/properties/{{ property.id }}/service-stop/new">New Service Stop</a></p>
-
+{% include "partials/header.html" %}
     {% if property.service_stops %}
         <ul>
         {% for stop in property.service_stops %}

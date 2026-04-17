@@ -7,11 +7,12 @@
 </head>
 <body>
     <div class="page">
+        {% include "partials/header.html" %}
         <header class="hero">
             <div>
                 <div style="display:flex; align-items:center; gap:15px;">
     <img src="/static/logo.png" style="height:60px;">
-    <h1 style="margin:0;">Heinlin Ops</h1>
+    <a href="/schedule" class="button-link secondary">Schedule</a>
 </div>
                 <p>Field dashboard for service stops, properties, and job records.</p>
             </div>
@@ -21,7 +22,10 @@
                 <a href="/dev/seed" class="button-link secondary">Seed Demo</a>
             </div>
         </header>
-
+<a class="quick-tile" href="/schedule">
+    <div class="quick-title">Schedule</div>
+    <div class="quick-sub">View and manage upcoming jobs.</div>
+</a>
         <section class="card">
             <h2>Quick Actions</h2>
             <div class="quick-grid">

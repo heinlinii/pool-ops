@@ -62,3 +62,13 @@ class FileAttachment(Base):
     service_stop_id = Column(Integer, ForeignKey("service_stops.id"))
 
     service_stop = relationship("ServiceStop", back_populates="files")
+class ScheduleItem(Base):
+    __tablename__ = "schedule_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(String, default="")
+    assigned_to = Column(String, default="")
+    status = Column(String, default="scheduled")
+    notes = Column(Text, default="")
+    property_id = Column(Integer, ForeignKey("properties.id"))
+    property = relationship("Property")

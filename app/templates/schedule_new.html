@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Scheduled Job</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/styles.css?v=9501">
+</head>
+<body>
+    <div class="page">
+        <div class="app-header">
+            <div class="header-left">
+                <img src="/static/logo.png" class="logo">
+                <div>
+                    <div class="brand-title">Heinlin Ops</div>
+                    <div class="brand-sub">New Scheduled Job</div>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a href="/schedule" class="button-link secondary small">Back to Schedule</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Schedule a Job</h2>
+
+            <form method="post" action="/schedule/new">
+                <label>Property</label>
+                <select name="property_id" required>
+                    <option value="">Select Property</option>
+                    {% for p in properties %}
+                        <option value="{{ p.id }}">
+                            {{ p.address }}{% if p.client %} — {{ p.client.name }}{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label>Date</label>
+                <input type="date" name="date">
+
+                <label>Assigned To</label>
+                <input type="text" name="assigned_to" placeholder="Mike / Crew A / Justin">
+
+                <label>Status</label>
+                <select name="status">
+                    <option value="scheduled">Scheduled</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="weather delay">Weather Delay</option>
+                    <option value="needs reschedule">Needs Reschedule</option>
+                </select>
+
+                <label>Notes</label>
+                <textarea name="notes" placeholder="Gate code, cover issue, bring parts, weather watch, etc."></textarea>
+
+                <button type="submit">Save Scheduled Job</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
