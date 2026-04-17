@@ -1,47 +1,22 @@
 body {
-    margin: 0;
     font-family: Arial, sans-serif;
+    margin: 0;
     background: #f4f6f8;
-    color: #1f2937;
+    color: #111827;
 }
 
 .page {
-    max-width: 980px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 24px 16px 48px;
 }
 
-.topbar h1 {
-    margin: 0 0 8px;
-    font-size: 48px;
-    line-height: 1.05;
-}
-
-.topbar p {
-    margin: 0;
-    color: #6b7280;
-    font-size: 18px;
-}
-
 .card {
-    background: #ffffff;
+    background: white;
     border: 1px solid #e5e7eb;
-    border-radius: 24px;
-    padding: 24px;
-    margin-top: 22px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.04);
-}
-
-.card h2 {
-    margin-top: 0;
-    margin-bottom: 18px;
-    font-size: 22px;
-}
-
-.quick-links {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+    border-radius: 18px;
+    padding: 20px;
+    margin-top: 20px;
 }
 
 .button-link,
@@ -51,34 +26,10 @@ button {
     color: white;
     text-decoration: none;
     border: none;
-    border-radius: 14px;
-    padding: 12px 18px;
+    border-radius: 10px;
+    padding: 10px 14px;
     font-weight: 700;
     cursor: pointer;
-}
-
-.button-link:hover,
-button:hover {
-    opacity: 0.92;
-}
-
-.list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.list-item {
-    border: 1px solid #e5e7eb;
-    border-radius: 18px;
-    padding: 18px;
-    background: #f9fafb;
-}
-
-.muted {
-    color: #6b7280;
-    margin-top: 6px;
-    font-size: 15px;
 }
 
 input,
@@ -86,53 +37,24 @@ select,
 textarea {
     width: 100%;
     box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 14px;
+    padding: 12px;
     border: 1px solid #d1d5db;
-    border-radius: 14px;
-    padding: 14px;
+    border-radius: 10px;
     font-size: 16px;
-    margin-top: 8px;
-    margin-bottom: 16px;
     background: white;
 }
 
 textarea {
-    min-height: 110px;
-    resize: vertical;
+    min-height: 100px;
 }
 
 label {
     font-weight: 700;
 }
 
-.form-stack {
-    display: block;
-}
-
-.section-gap {
-    margin-top: 22px;
-    padding-top: 22px;
-    border-top: 1px solid #e5e7eb;
-}
-
-.helper {
+.muted {
     color: #6b7280;
     font-size: 14px;
-    margin-top: -8px;
-    margin-bottom: 12px;
 }
-
-@media (max-width: 640px) {
-    .topbar h1 {
-        font-size: 34px;
-    }
-
-    .card {
-        padding: 18px;
-        border-radius: 20px;
-    }
-
-    .button-link,
-    button {
-        width: 100%;
-        text-align: center;
-    

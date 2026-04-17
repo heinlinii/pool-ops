@@ -3,68 +3,46 @@
 <head>
     <title>Add Property</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=3001">
+    <link rel="stylesheet" href="/static/styles.css?v=9101">
 </head>
 <body>
     <div class="page">
-        <header class="topbar">
-            <h1>Add Property</h1>
-            <p>Create a new property and attach it to an existing or new client.</p>
-            <div class="quick-links">
-                <a href="/" class="button-link">Back to Properties</a>
-            </div>
-        </header>
+        <h1>Add Property</h1>
+        <p><a href="/">Back to Properties</a></p>
 
-        <section class="card">
-            <form method="post" action="/properties/new" class="form-stack">
+        <div class="card">
+            <form method="post" action="/properties/new">
+                <label>Property Address</label>
+                <input type="text" name="address" required>
 
-                <div class="section-gap" style="border-top:0; padding-top:0; margin-top:0;">
-                    <h2>Property Info</h2>
+                <label>Pool Type</label>
+                <input type="text" name="pool_type">
 
-                    <label>Property Address</label>
-                    <input type="text" name="address" placeholder="1234 Oak Hill Rd" required>
+                <label>Property Notes</label>
+                <textarea name="notes"></textarea>
 
-                    <label>Pool Type</label>
-                    <input type="text" name="pool_type" placeholder="Gunite, Vinyl, Fiberglass, etc.">
+                <h2>Attach to Existing Client</h2>
+                <label>Select Existing Client</label>
+                <select name="client_id">
+                    <option value="">-- Create New Client Instead --</option>
+                    {% for c in clients %}
+                        <option value="{{ c.id }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
 
-                    <label>Property Notes</label>
-                    <textarea name="notes" placeholder="Auto cover issue, equipment notes, gate code, dog in yard, etc."></textarea>
-                </div>
+                <h2>Or Create New Client</h2>
+                <label>Client Name</label>
+                <input type="text" name="client_name">
 
-                <div class="section-gap">
-                    <h2>Attach to Existing Client</h2>
+                <label>Client Phone</label>
+                <input type="text" name="client_phone">
 
-                    <label>Select Existing Client</label>
-                    <select name="client_id">
-                        <option value="">-- Create New Client Instead --</option>
-                        {% for c in clients %}
-                            <option value="{{ c.id }}">{{ c.name }}</option>
-                        {% endfor %}
-                    </select>
+                <label>Client Email</label>
+                <input type="email" name="client_email">
 
-                    <div class="helper">
-                        If you choose an existing client, the new-client fields below are ignored.
-                    </div>
-                </div>
-
-                <div class="section-gap">
-                    <h2>Or Create New Client</h2>
-
-                    <label>Client Name</label>
-                    <input type="text" name="client_name" placeholder="John Smith">
-
-                    <label>Client Phone</label>
-                    <input type="text" name="client_phone" placeholder="812-555-1212">
-
-                    <label>Client Email</label>
-                    <input type="email" name="client_email" placeholder="john@email.com">
-                </div>
-
-                <div class="section-gap">
-                    <button type="submit">Create Property</button>
-                </div>
+                <button type="submit">Create Property</button>
             </form>
-        </section>
+        </div>
     </div>
 </body>
 </html>

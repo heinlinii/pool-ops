@@ -1,84 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Service Stop</title>
+    <title>Service Stop Detail</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=2000">
+    <link rel="stylesheet" href="/static/styles.css?v=9101">
 </head>
 <body>
     <div class="page">
-        <header class="topbar">
-            <h1>Service Stop</h1>
-            <p>
-                {{ service_stop.property.address if service_stop.property else "No property" }}
-            </p>
-            <div class="quick-links">
-                {% if service_stop.property %}
-                    <a href="/properties/{{ service_stop.property.id }}" class="button-link">Back to Property</a>
-                {% endif %}
-                <a href="/export/service-stops" class="button-link">Export CSV</a>
-            </div>
-        </header>
+        <h1>Service Stop Detail</h1>
+        <p><a href="/properties/{{ service_stop.property.id }}">Back to Property</a></p>
 
-        <div class="kpi-row">
-            <div class="kpi">
-                <div class="kpi-label">Date</div>
-                <div class="kpi-value" style="font-size:20px;">{{ service_stop.date or "-" }}</div>
-            </div>
-            <div class="kpi">
-                <div class="kpi-label">Tech</div>
-                <div class="kpi-value" style="font-size:20px;">{{ service_stop.tech_name or "-" }}</div>
-            </div>
-            <div class="kpi">
-                <div class="kpi-label">Paid Status</div>
-                <div class="kpi-value" style="font-size:20px;">{{ service_stop.paid_status or "-" }}</div>
-            </div>
-            <div class="kpi">
-                <div class="kpi-label">Invoice Total</div>
-                <div class="kpi-value" style="font-size:20px;">${{ "%.2f"|format(invoice_total) }}</div>
-            </div>
+        <div class="card">
+            <p><strong>Date:</strong> {{ service_stop.date or "—" }}</p>
+            <p><strong>Tech:</strong> {{ service_stop.tech_name or "—" }}</p>
+            <p><strong>Problem:</strong> {{ service_stop.problem_reported or "—" }}</p>
+            <p><strong>Work:</strong> {{ service_stop.work_performed or "—" }}</p>
+            <p><strong>Recommendation:</strong> {{ service_stop.recommendation or "—" }}</p>
+            <p><strong>Invoice Total:</strong> {{ invoice_total }}</p>
         </div>
-
-        <div class="grid two" style="margin-top:20px;">
-            <section class="card">
-                <h2>Problem Reported</h2>
-                <p>{{ service_stop.problem_reported or "None entered." }}</p>
-
-                <h2 class="section-gap">Work Performed</h2>
-                <p>{{ service_stop.work_performed or "None entered." }}</p>
-
-                <h2 class="section-gap">Recommendation</h2>
-                <p>{{ service_stop.recommendation or "None entered." }}</p>
-            </section>
-
-            <section class="card">
-                <h2>Billing</h2>
-                <div class="list">
-                    <div class="list-item">Service Charge: ${{ "%.2f"|format(service_stop.billed_amount or 0) }}</div>
-                    <div class="list-item">Labor Hours: {{ service_stop.labor_hours or 0 }}</div>
-                    <div class="list-item">Material Cost: ${{ "%.2f"|format(service_stop.material_cost or 0) }}</div>
-                    <div class="list-item">Trip Charge: ${{ "%.2f"|format(service_stop.trip_charge or 0) }}</div>
-                    <div class="list-item">Tax: ${{ "%.2f"|format(service_stop.tax or 0) }}</div>
-                </div>
-
-                <h2 class="section-gap">Invoice Notes</h2>
-                <p>{{ service_stop.invoice_notes or "None entered." }}</p>
-            </section>
-        </div>
-
-        <section class="card" style="margin-top:20px;">
-            <h2>Attachments</h2>
-
-            {% if service_stop.files %}
-                {% for f in service_stop.files %}
-                    <a class="file-pill" href="/uploads/{{ f.stored_name }}" target="_blank">
-                        {{ f.category or "file" }} — {{ f.original_name }}
-                    </a>
-                {% endfor %}
-            {% else %}
-                <p class="muted">No files attached.</p>
-            {% endif %}
-        </section>
     </div>
 </body>
 </html>

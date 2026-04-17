@@ -3,91 +3,17 @@
 <head>
     <title>New Service Stop</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=2000">
+    <link rel="stylesheet" href="/static/styles.css?v=9101">
 </head>
 <body>
     <div class="page">
-        <header class="topbar">
-            <h1>New Service Stop</h1>
-            <p>{{ property.address }}</p>
-            <div class="quick-links">
-                <a href="/properties/{{ property.id }}" class="button-link">Back to Property</a>
-            </div>
-        </header>
+        <h1>New Service Stop</h1>
+        <p><a href="/properties/{{ property.id }}">Back to Property</a></p>
 
-        <section class="card">
-            <form method="post" enctype="multipart/form-data" class="form-stack">
-                <div class="section-gap" style="border-top:0; padding-top:0; margin-top:0;">
-                    <h2>1. Before Photos</h2>
-                    <div class="photo-group">
-                        <label>Take / Upload Before Photos</label>
-                        <input type="file" name="before_photos" accept="image/*" capture="environment" multiple>
-                        <div class="helper">On iPhone this should open Camera or Photo Library.</div>
-                    </div>
-                </div>
-
-                <div class="section-gap">
-                    <h2>2. Service Details</h2>
-
-                    <label>Date</label>
-                    <input type="date" name="date_value">
-
-                    <label>Tech Name</label>
-                    <input type="text" name="tech_name" placeholder="Mike">
-
-                    <label>Problem Reported</label>
-                    <textarea name="problem_reported" placeholder="Customer says cover dragging on right side..."></textarea>
-
-                    <label>Work Performed</label>
-                    <textarea name="work_performed" placeholder="Adjusted track, cleaned debris, tested motor..."></textarea>
-
-                    <label>Recommendation</label>
-                    <textarea name="recommendation" placeholder="Return in one week and recheck alignment..."></textarea>
-                </div>
-
-                <div class="section-gap">
-                    <h2>3. Billing</h2>
-
-                    <label>Service Charge</label>
-                    <input type="number" step="0.01" name="billed_amount" value="0">
-
-                    <label>Labor Hours</label>
-                    <input type="number" step="0.1" name="labor_hours" value="0">
-
-                    <label>Material Cost</label>
-                    <input type="number" step="0.01" name="material_cost" value="0">
-
-                    <label>Trip Charge</label>
-                    <input type="number" step="0.01" name="trip_charge" value="0">
-
-                    <label>Tax</label>
-                    <input type="number" step="0.01" name="tax" value="0">
-
-                    <label>Paid Status</label>
-                    <select name="paid_status">
-                        <option value="unpaid">Unpaid</option>
-                        <option value="paid">Paid</option>
-                    </select>
-
-                    <label>Invoice Notes</label>
-                    <textarea name="invoice_notes" placeholder="Customer wants emailed invoice, paid by check, etc."></textarea>
-                </div>
-
-                <div class="section-gap">
-                    <h2>4. After Photos</h2>
-
-                    <label>Take / Upload After Photos</label>
-                    <input type="file" name="after_photos" accept="image/*" capture="environment" multiple>
-
-                    <label>Other Files</label>
-                    <input type="file" name="general_files" multiple>
-                </div>
-
-                <div class="section-gap">
-                    <button type="submit">Save Service Stop</button>
-                </div>
-            </form>
-        </section>
+        <div class="card">
+            <p><strong>Property:</strong> {{ property.address }}</p>
+            <p>This page is live. Save route can be wired next.</p>
+        </div>
     </div>
 </body>
 </html>

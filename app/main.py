@@ -5,7 +5,7 @@ from starlette.templating import Jinja2Templates
 from sqlalchemy.orm import Session, joinedload
 
 from .db import SessionLocal, engine, Base
-from .models import Client, Property, ServiceStop, FileAttachment
+from .models import Client, Property, ServiceStop
 
 app = FastAPI()
 
@@ -17,8 +17,6 @@ app.mount("/uploads", StaticFiles(directory="app/uploads"), name="uploads")
 templates = Jinja2Templates(directory="app/templates")
 
 
-# ---------------- DB ---------------- #
-
 def get_db():
     db = SessionLocal()
     try:
@@ -26,8 +24,6 @@ def get_db():
     finally:
         db.close()
 
-
-# ---------------- HOME ---------------- #
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request, db: Session = Depends(get_db)):
@@ -37,7 +33,6 @@ def home(request: Request, db: Session = Depends(get_db)):
         .order_by(Property.id.desc())
         .all()
     )
-
     return templates.TemplateResponse(
         "index.html",
         {
@@ -47,12 +42,9 @@ def home(request: Request, db: Session = Depends(get_db)):
     )
 
 
-# ---------------- NEW PROPERTY ---------------- #
-
 @app.get("/properties/new", response_class=HTMLResponse)
 def new_property(request: Request, db: Session = Depends(get_db)):
     clients = db.query(Client).order_by(Client.name.asc()).all()
-
     return templates.TemplateResponse(
         "property_new.html",
         {
@@ -103,7 +95,6 @@ def create_property(
         notes=notes.strip(),
         client_id=selected_client.id,
     )
-
     db.add(prop)
     db.commit()
     db.refresh(prop)
@@ -111,15 +102,13 @@ def create_property(
     return RedirectResponse(url=f"/properties/{prop.id}", status_code=303)
 
 
-# ---------------- PROPERTY DETAIL ---------------- #
-
 @app.get("/properties/{property_id}", response_class=HTMLResponse)
 def property_detail(request: Request, property_id: int, db: Session = Depends(get_db)):
     prop = (
         db.query(Property)
         .options(
             joinedload(Property.client),
-            joinedload(Property.service_stops).joinedload(ServiceStop.files),
+            joinedload(Property.service_stops),
         )
         .filter(Property.id == property_id)
         .first()
@@ -137,11 +126,14 @@ def property_detail(request: Request, property_id: int, db: Session = Depends(ge
     )
 
 
-# ---------------- SERVICE STOP ---------------- #
-
 @app.get("/properties/{property_id}/service-stop/new", response_class=HTMLResponse)
 def new_service_stop(request: Request, property_id: int, db: Session = Depends(get_db)):
-    prop = db.query(Property).filter(Property.id == property_id).first()
+    prop = (
+        db.query(Property)
+        .options(joinedload(Property.client))
+        .filter(Property.id == property_id)
+        .first()
+    )
 
     if not prop:
         raise HTTPException(status_code=404, detail="Property not found")
@@ -159,10 +151,7 @@ def new_service_stop(request: Request, property_id: int, db: Session = Depends(g
 def service_stop_detail(request: Request, stop_id: int, db: Session = Depends(get_db)):
     stop = (
         db.query(ServiceStop)
-        .options(
-            joinedload(ServiceStop.property).joinedload(Property.client),
-            joinedload(ServiceStop.files),
-        )
+        .options(joinedload(ServiceStop.property).joinedload(Property.client))
         .filter(ServiceStop.id == stop_id)
         .first()
     )
@@ -185,3 +174,50 @@ def service_stop_detail(request: Request, stop_id: int, db: Session = Depends(ge
             "invoice_total": invoice_total,
         },
     )
+
+
+@app.get("/dev/seed")
+def seed(db: Session = Depends(get_db)):
+    existing_property = db.query(Property).filter(Property.address == "1234 Oak Hill Rd").first()
+    if existing_property:
+        return {"status": "already seeded"}
+
+    client = Client(
+        name="John Smith",
+        phone="812-555-1212",
+        email="john@email.com",
+    )
+    db.add(client)
+    db.commit()
+    db.refresh(client)
+
+    prop = Property(
+        address="1234 Oak Hill Rd",
+        pool_type="Gunite",
+        notes="Auto cover issue on right track.",
+        client_id=client.id,
+    )
+    db.add(prop)
+    db.commit()
+    db.refresh(prop)
+
+    stop = ServiceStop(
+        date="2026-04-12",
+        tech_name="Mike",
+        problem_reported="Customer reported cover dragging on right side.",
+        work_performed="Adjusted track, cleaned debris, tested motor.",
+        recommendation="Recheck after one week of use.",
+        billed_amount=275.00,
+        labor_hours=2.5,
+        material_cost=18.00,
+        trip_charge=35.00,
+        tax=19.04,
+        paid_status="unpaid",
+        invoice_notes="Customer requested emailed invoice.",
+        status="completed",
+        property_id=prop.id,
+    )
+    db.add(stop)
+    db.commit()
+
+    return {"status": "seeded"}

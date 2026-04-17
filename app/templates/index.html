@@ -3,56 +3,33 @@
 <head>
     <title>Heinlin Ops</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=5001">
+    <link rel="stylesheet" href="/static/styles.css?v=9101">
 </head>
 <body>
     <div class="page">
-        <header class="topbar">
-            <h1>Heinlin Ops</h1>
-            <p>Field dashboard for service stops and job records.</p>
+        <h1>Heinlin Ops</h1>
+        <p>Field dashboard for service stops and job records.</p>
 
-            <div class="quick-links" style="margin-top:16px;">
-                <a href="/properties/new" class="button-link">Add Property</a>
-                <a href="/dev/seed" class="button-link">Seed Demo</a>
-            </div>
-        </header>
+        <p><a class="button-link" href="/properties/new">Add Property</a></p>
 
-        <section class="card">
-            <h2>Quick Actions</h2>
-            <div class="quick-links">
-                <a href="/properties/new" class="button-link">+ Add Property</a>
-                <a href="/properties/1" class="button-link">Open Demo Property</a>
-                <a href="/properties/1/service-stop/new" class="button-link">New Service Stop</a>
-            </div>
-        </section>
-
-        <section class="card">
+        <div class="card">
             <h2>All Properties</h2>
 
             {% if properties %}
-                <div class="list">
-                    {% for p in properties %}
-                        <div class="list-item">
-                            <div>
-                                <div style="font-weight:700;">
-                                    <a href="/properties/{{ p.id }}">{{ p.address }}</a>
-                                </div>
-                                {% if p.client %}
-                                    <div class="muted">Client: {{ p.client.name }}</div>
-                                {% endif %}
-                            </div>
-
-                            <div class="quick-links">
-                                <a href="/properties/{{ p.id }}" class="button-link">Open</a>
-                                <a href="/properties/{{ p.id }}/service-stop/new" class="button-link">Add Stop</a>
-                            </div>
+                <ul>
+                {% for p in properties %}
+                    <li style="margin-bottom: 10px;">
+                        <a href="/properties/{{ p.id }}">{{ p.address }}</a>
+                        <div class="muted">
+                            Client: {{ p.client.name if p.client else "—" }}
                         </div>
-                    {% endfor %}
-                </div>
+                    </li>
+                {% endfor %}
+                </ul>
             {% else %}
                 <p>No properties yet.</p>
             {% endif %}
-        </section>
+        </div>
     </div>
 </body>
 </html>

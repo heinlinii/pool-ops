@@ -1,87 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Property</title>
+    <title>{{ property.address }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=2000">
+    <link rel="stylesheet" href="/static/styles.css?v=9101">
 </head>
 <body>
     <div class="page">
-        <header class="topbar">
-            <h1>{{ property.address }}</h1>
-            <p>
-                {% if property.client %}
-                    Client: {{ property.client.name }}
-                {% else %}
-                    No client attached
-                {% endif %}
-            </p>
-            <div class="quick-links">
-                <a href="/" class="button-link">Back to Properties</a>
-                <a href="/properties/{{ property.id }}/service-stop/new" class="button-link primary">New Service Stop</a>
-            </div>
-        </header>
+        <h1>{{ property.address }}</h1>
+        <p><a href="/">Back to Properties</a></p>
 
-        <div class="kpi-row">
-            <div class="kpi">
-                <div class="kpi-label">Pool Type</div>
-                <div class="kpi-value">{{ property.pool_type or "-" }}</div>
-            </div>
-            <div class="kpi">
-                <div class="kpi-label">Service Stops</div>
-                <div class="kpi-value">{{ property.service_stops|length }}</div>
-            </div>
-            <div class="kpi">
-                <div class="kpi-label">Client Phone</div>
-                <div class="kpi-value" style="font-size:18px;">
-                    {% if property.client %}{{ property.client.phone or "-" }}{% else %}-{% endif %}
-                </div>
-            </div>
-            <div class="kpi">
-                <div class="kpi-label">Client Email</div>
-                <div class="kpi-value" style="font-size:18px;">
-                    {% if property.client %}{{ property.client.email or "-" }}{% else %}-{% endif %}
-                </div>
-            </div>
+        <div class="card">
+            <p><strong>Client:</strong> {{ property.client.name if property.client else "—" }}</p>
+            <p><strong>Pool Type:</strong> {{ property.pool_type or "—" }}</p>
+            <p><strong>Notes:</strong> {{ property.notes or "—" }}</p>
+            <p><a class="button-link" href="/properties/{{ property.id }}/service-stop/new">New Service Stop</a></p>
         </div>
 
-        <div class="grid two" style="margin-top: 20px;">
-            <section class="card">
-                <h2>Property Notes</h2>
-                <p class="muted">{{ property.notes or "No notes yet." }}</p>
-            </section>
-
-            <section class="card">
-                <h2>Quick Actions</h2>
-                <div class="form-stack">
-                    <a href="/properties/{{ property.id }}/service-stop/new" class="button-link primary">Start New Service Stop</a>
-                    <a href="/export/service-stops" class="button-link">Export Service Stops CSV</a>
-                </div>
-            </section>
-        </div>
-
-        <section class="card" style="margin-top: 20px;">
+        <div class="card">
             <h2>Service Stops</h2>
-
             {% if property.service_stops %}
-                <div class="list">
-                    {% for s in property.service_stops %}
-                        <div class="list-item">
-                            <a href="/service-stops/{{ s.id }}">
-                                {{ s.date or "No date" }} — {{ s.problem_reported or "No problem entered" }}
-                            </a>
-                            <div class="muted">
-                                Tech: {{ s.tech_name or "-" }} |
-                                Status: {{ s.status or "-" }} |
-                                Files: {{ s.files|length }}
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
+                <ul>
+                {% for stop in property.service_stops %}
+                    <li>
+                        <a href="/service-stops/{{ stop.id }}">
+                            {{ stop.date or "No date" }} - {{ stop.problem_reported or "No problem entered" }}
+                        </a>
+                    </li>
+                {% endfor %}
+                </ul>
             {% else %}
-                <p class="muted">No service stops yet.</p>
+                <p>No service stops yet.</p>
             {% endif %}
-        </section>
+        </div>
     </div>
 </body>
 </html>
