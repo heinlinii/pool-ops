@@ -101,7 +101,51 @@ def create_property(
 
     return RedirectResponse(url=f"/properties/{prop.id}", status_code=303)
 
+@app.post("/properties/{property_id}/service-stop/new")
+def create_service_stop(
+    property_id: int,
+    date: str = Form(""),
+    tech_name: str = Form(""),
+    problem_reported: str = Form(""),
+    work_performed: str = Form(""),
+    recommendation: str = Form(""),
+    billed_amount: float = Form(0),
+    labor_hours: float = Form(0),
+    material_cost: float = Form(0),
+    trip_charge: float = Form(0),
+    tax: float = Form(0),
+    paid_status: str = Form("unpaid"),
+    invoice_notes: str = Form(""),
+    status: str = Form("completed"),
+    db: Session = Depends(get_db),
+):
+    prop = db.query(Property).filter(Property.id == property_id).first()
 
+    if not prop:
+        raise HTTPException(status_code=404, detail="Property not found")
+
+    stop = ServiceStop(
+        date=date.strip(),
+        tech_name=tech_name.strip(),
+        problem_reported=problem_reported.strip(),
+        work_performed=work_performed.strip(),
+        recommendation=recommendation.strip(),
+        billed_amount=billed_amount or 0,
+        labor_hours=labor_hours or 0,
+        material_cost=material_cost or 0,
+        trip_charge=trip_charge or 0,
+        tax=tax or 0,
+        paid_status=paid_status.strip() or "unpaid",
+        invoice_notes=invoice_notes.strip(),
+        status=status.strip() or "completed",
+        property_id=prop.id,
+    )
+
+    db.add(stop)
+    db.commit()
+    db.refresh(stop)
+
+    return RedirectResponse(url=f"/service-stops/{stop.id}", status_code=303)
 @app.get("/properties/{property_id}", response_class=HTMLResponse)
 def property_detail(request: Request, property_id: int, db: Session = Depends(get_db)):
     prop = (

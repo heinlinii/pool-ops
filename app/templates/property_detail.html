@@ -1,38 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ property.address }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=9101">
-</head>
-<body>
-    <div class="page">
-        <h1>{{ property.address }}</h1>
-        <p><a href="/">Back to Properties</a></p>
+<div class="card">
+    <h2>Service Stops</h2>
+    <p><a class="button-link" href="/properties/{{ property.id }}/service-stop/new">New Service Stop</a></p>
 
-        <div class="card">
-            <p><strong>Client:</strong> {{ property.client.name if property.client else "—" }}</p>
-            <p><strong>Pool Type:</strong> {{ property.pool_type or "—" }}</p>
-            <p><strong>Notes:</strong> {{ property.notes or "—" }}</p>
-            <p><a class="button-link" href="/properties/{{ property.id }}/service-stop/new">New Service Stop</a></p>
-        </div>
-
-        <div class="card">
-            <h2>Service Stops</h2>
-            {% if property.service_stops %}
-                <ul>
-                {% for stop in property.service_stops %}
-                    <li>
-                        <a href="/service-stops/{{ stop.id }}">
-                            {{ stop.date or "No date" }} - {{ stop.problem_reported or "No problem entered" }}
-                        </a>
-                    </li>
-                {% endfor %}
-                </ul>
-            {% else %}
-                <p>No service stops yet.</p>
-            {% endif %}
-        </div>
-    </div>
-</body>
-</html>
+    {% if property.service_stops %}
+        <ul>
+        {% for stop in property.service_stops %}
+            <li>
+                <a href="/service-stops/{{ stop.id }}">
+                    {{ stop.date or "No date" }} - {{ stop.problem_reported or "No problem entered" }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No service stops yet.</p>
+    {% endif %}
+</div>

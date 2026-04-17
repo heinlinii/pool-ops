@@ -3,7 +3,7 @@
 <head>
     <title>New Service Stop</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=9101">
+    <link rel="stylesheet" href="/static/styles.css?v=9401">
 </head>
 <body>
     <div class="page">
@@ -12,7 +12,59 @@
 
         <div class="card">
             <p><strong>Property:</strong> {{ property.address }}</p>
-            <p>This page is live. Save route can be wired next.</p>
+            <p class="muted">Client: {{ property.client.name if property.client else "—" }}</p>
+
+            <form method="post" action="/properties/{{ property.id }}/service-stop/new">
+                <label>Date</label>
+                <input type="date" name="date">
+
+                <label>Tech Name</label>
+                <input type="text" name="tech_name" placeholder="Mike">
+
+                <label>Problem Reported</label>
+                <textarea name="problem_reported" placeholder="Customer reported..."></textarea>
+
+                <label>Work Performed</label>
+                <textarea name="work_performed" placeholder="Adjusted track, cleaned debris..."></textarea>
+
+                <label>Recommendation</label>
+                <textarea name="recommendation" placeholder="Recommended next steps..."></textarea>
+
+                <label>Billed Amount</label>
+                <input type="number" step="0.01" name="billed_amount" value="0">
+
+                <label>Labor Hours</label>
+                <input type="number" step="0.01" name="labor_hours" value="0">
+
+                <label>Material Cost</label>
+                <input type="number" step="0.01" name="material_cost" value="0">
+
+                <label>Trip Charge</label>
+                <input type="number" step="0.01" name="trip_charge" value="0">
+
+                <label>Tax</label>
+                <input type="number" step="0.01" name="tax" value="0">
+
+                <label>Paid Status</label>
+                <select name="paid_status">
+                    <option value="unpaid">Unpaid</option>
+                    <option value="paid">Paid</option>
+                    <option value="partial">Partial</option>
+                </select>
+
+                <label>Invoice Notes</label>
+                <textarea name="invoice_notes" placeholder="Customer requested..."></textarea>
+
+                <label>Status</label>
+                <select name="status">
+                    <option value="completed">Completed</option>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="pending">Pending</option>
+                    <option value="needs follow-up">Needs Follow-Up</option>
+                </select>
+
+                <button type="submit">Save Service Stop</button>
+            </form>
         </div>
     </div>
 </body>
