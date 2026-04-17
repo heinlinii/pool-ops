@@ -34,9 +34,9 @@ def home(request: Request, db: Session = Depends(get_db)):
         .all()
     )
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "properties": properties,
         },
     )
@@ -46,9 +46,9 @@ def home(request: Request, db: Session = Depends(get_db)):
 def new_property(request: Request, db: Session = Depends(get_db)):
     clients = db.query(Client).order_by(Client.name.asc()).all()
     return templates.TemplateResponse(
+        request,
         "property_new.html",
         {
-            "request": request,
             "clients": clients,
         },
     )
@@ -118,9 +118,9 @@ def property_detail(request: Request, property_id: int, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Property not found")
 
     return templates.TemplateResponse(
+        request,
         "property_detail.html",
         {
-            "request": request,
             "property": prop,
         },
     )
@@ -139,9 +139,9 @@ def new_service_stop(request: Request, property_id: int, db: Session = Depends(g
         raise HTTPException(status_code=404, detail="Property not found")
 
     return templates.TemplateResponse(
+        request,
         "service_stop_new.html",
         {
-            "request": request,
             "property": prop,
         },
     )
@@ -167,9 +167,9 @@ def service_stop_detail(request: Request, stop_id: int, db: Session = Depends(ge
     )
 
     return templates.TemplateResponse(
+        request,
         "service_stop_detail.html",
         {
-            "request": request,
             "service_stop": stop,
             "invoice_total": invoice_total,
         },
