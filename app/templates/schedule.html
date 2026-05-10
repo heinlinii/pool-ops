@@ -3,77 +3,81 @@
 <head>
     <title>Schedule</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=9501">
+    <link rel="stylesheet" href="/static/styles.css?v=9701">
 </head>
 <body>
     <div class="page">
-        <div class="app-header">
-            <div class="header-left">
-                <img src="/static/logo.png" class="logo">
-                <div>
-                    <div class="brand-title">Heinlin Ops</div>
-                    <div class="brand-sub">Schedule</div>
-                </div>
-            </div>
-
-            <div class="header-actions">
-                <a href="/" class="button-link secondary small">Home</a>
-                <a href="/schedule/new" class="button-link small">Add Scheduled Job</a>
-            </div>
-        </div>
+        {% include "partials/header.html" %}
 
         <div class="card">
             <div class="section-head">
-                <h2>Schedule</h2>
-                <span class="badge">{{ schedule_items|length }} total</span>
+                <h2>Today</h2>
+                <span class="badge">{{ today_items|length }} jobs</span>
             </div>
 
-            {% if schedule_items %}
+            <p class="muted">Date: {{ today_str }}</p>
+
+            {% if today_items %}
                 <div class="property-list">
-                    {% for item in schedule_items %}
+                    {% for item in today_items %}
                         <div class="property-card">
                             <div class="property-main">
                                 <div class="property-address">
-                                    <a href="/properties/{{ item.property.id }}">
-                                        {{ item.property.address }}
-                                    </a>
+                                    <a href="/properties/{{ item.property.id }}">{{ item.property.address }}</a>
                                 </div>
-
-                                <div class="muted">
-                                    Client: {{ item.property.client.name if item.property.client else "—" }}
-                                </div>
-
-                                <div class="muted">
-                                    Date: {{ item.date or "—" }}
-                                </div>
-
-                                <div class="muted">
-                                    Assigned To: {{ item.assigned_to or "—" }}
-                                </div>
-
-                                <div class="muted">
-                                    Status: {{ item.status or "—" }}
-                                </div>
-
+                                <div class="muted">Client: {{ item.property.client.name if item.property.client else "—" }}</div>
+                                <div class="muted">Assigned To: {{ item.assigned_to or "—" }}</div>
+                                <div class="muted">Status: {{ item.status or "—" }}</div>
                                 {% if item.notes %}
-                                    <div class="muted">
-                                        Notes: {{ item.notes }}
-                                    </div>
+                                    <div class="muted">Notes: {{ item.notes }}</div>
                                 {% endif %}
                             </div>
 
                             <div class="property-actions">
-                                <a href="/properties/{{ item.property.id }}" class="button-link small">Open Property</a>
+                                <a href="/properties/{{ item.property.id }}" class="button-link small">Open</a>
                                 <a href="/properties/{{ item.property.id }}/service-stop/new" class="button-link secondary small">Start Stop</a>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="empty-state">
-                    <p>No scheduled jobs yet.</p>
-                    <a href="/schedule/new" class="button-link">Create First Scheduled Job</a>
+                <p>No jobs scheduled for today.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <div class="section-head">
+                <h2>Tomorrow</h2>
+                <span class="badge">{{ tomorrow_items|length }} jobs</span>
+            </div>
+
+            <p class="muted">Date: {{ tomorrow_str }}</p>
+
+            {% if tomorrow_items %}
+                <div class="property-list">
+                    {% for item in tomorrow_items %}
+                        <div class="property-card">
+                            <div class="property-main">
+                                <div class="property-address">
+                                    <a href="/properties/{{ item.property.id }}">{{ item.property.address }}</a>
+                                </div>
+                                <div class="muted">Client: {{ item.property.client.name if item.property.client else "—" }}</div>
+                                <div class="muted">Assigned To: {{ item.assigned_to or "—" }}</div>
+                                <div class="muted">Status: {{ item.status or "—" }}</div>
+                                {% if item.notes %}
+                                    <div class="muted">Notes: {{ item.notes }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="property-actions">
+                                <a href="/properties/{{ item.property.id }}" class="button-link small">Open</a>
+                                <a href="/properties/{{ item.property.id }}/service-stop/new" class="button-link secondary small">Start Stop</a>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
+            {% else %}
+                <p>No jobs scheduled for tomorrow.</p>
             {% endif %}
         </div>
     </div>

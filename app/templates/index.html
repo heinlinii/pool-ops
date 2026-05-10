@@ -3,35 +3,26 @@
 <head>
     <title>Heinlin Ops</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/styles.css?v=9301">
+    <link rel="stylesheet" href="/static/styles.css?v=9701">
 </head>
 <body>
     <div class="page">
         {% include "partials/header.html" %}
-        <header class="hero">
-            <div>
-                <div style="display:flex; align-items:center; gap:15px;">
-    <img src="/static/logo.png" style="height:60px;">
-    <a href="/schedule" class="button-link secondary">Schedule</a>
-</div>
-                <p>Field dashboard for service stops, properties, and job records.</p>
+
+        <section class="card">
+            <div class="section-head">
+                <h2>Quick Actions</h2>
             </div>
 
-            <div class="hero-actions">
-                <a href="/properties/new" class="button-link">Add Property</a>
-                <a href="/dev/seed" class="button-link secondary">Seed Demo</a>
-            </div>
-        </header>
-<a class="quick-tile" href="/schedule">
-    <div class="quick-title">Schedule</div>
-    <div class="quick-sub">View and manage upcoming jobs.</div>
-</a>
-        <section class="card">
-            <h2>Quick Actions</h2>
             <div class="quick-grid">
                 <a class="quick-tile" href="/properties/new">
                     <div class="quick-title">Add Property</div>
                     <div class="quick-sub">Create a new property record.</div>
+                </a>
+
+                <a class="quick-tile" href="/schedule">
+                    <div class="quick-title">Schedule</div>
+                    <div class="quick-sub">View today, tomorrow, and upcoming jobs.</div>
                 </a>
 
                 <a class="quick-tile" href="/properties/1">
@@ -42,11 +33,6 @@
                 <a class="quick-tile" href="/properties/1/service-stop/new">
                     <div class="quick-title">New Service Stop</div>
                     <div class="quick-sub">Start a job visit entry.</div>
-                </a>
-
-                <a class="quick-tile" href="/service-stops/1">
-                    <div class="quick-title">Service Stop Detail</div>
-                    <div class="quick-sub">Review the seeded stop.</div>
                 </a>
             </div>
         </section>

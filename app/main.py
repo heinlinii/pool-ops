@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 from fastapi import FastAPI, Request, Depends, HTTPException, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -101,51 +103,7 @@ def create_property(
 
     return RedirectResponse(url=f"/properties/{prop.id}", status_code=303)
 
-@app.post("/properties/{property_id}/service-stop/new")
-def create_service_stop(
-    property_id: int,
-    date: str = Form(""),
-    tech_name: str = Form(""),
-    problem_reported: str = Form(""),
-    work_performed: str = Form(""),
-    recommendation: str = Form(""),
-    billed_amount: float = Form(0),
-    labor_hours: float = Form(0),
-    material_cost: float = Form(0),
-    trip_charge: float = Form(0),
-    tax: float = Form(0),
-    paid_status: str = Form("unpaid"),
-    invoice_notes: str = Form(""),
-    status: str = Form("completed"),
-    db: Session = Depends(get_db),
-):
-    prop = db.query(Property).filter(Property.id == property_id).first()
 
-    if not prop:
-        raise HTTPException(status_code=404, detail="Property not found")
-
-    stop = ServiceStop(
-        date=date.strip(),
-        tech_name=tech_name.strip(),
-        problem_reported=problem_reported.strip(),
-        work_performed=work_performed.strip(),
-        recommendation=recommendation.strip(),
-        billed_amount=billed_amount or 0,
-        labor_hours=labor_hours or 0,
-        material_cost=material_cost or 0,
-        trip_charge=trip_charge or 0,
-        tax=tax or 0,
-        paid_status=paid_status.strip() or "unpaid",
-        invoice_notes=invoice_notes.strip(),
-        status=status.strip() or "completed",
-        property_id=prop.id,
-    )
-
-    db.add(stop)
-    db.commit()
-    db.refresh(stop)
-
-    return RedirectResponse(url=f"/service-stops/{stop.id}", status_code=303)
 @app.get("/properties/{property_id}", response_class=HTMLResponse)
 def property_detail(request: Request, property_id: int, db: Session = Depends(get_db)):
     prop = (
@@ -191,6 +149,53 @@ def new_service_stop(request: Request, property_id: int, db: Session = Depends(g
     )
 
 
+@app.post("/properties/{property_id}/service-stop/new")
+def create_service_stop(
+    property_id: int,
+    date: str = Form(""),
+    tech_name: str = Form(""),
+    problem_reported: str = Form(""),
+    work_performed: str = Form(""),
+    recommendation: str = Form(""),
+    billed_amount: float = Form(0),
+    labor_hours: float = Form(0),
+    material_cost: float = Form(0),
+    trip_charge: float = Form(0),
+    tax: float = Form(0),
+    paid_status: str = Form("unpaid"),
+    invoice_notes: str = Form(""),
+    status: str = Form("completed"),
+    db: Session = Depends(get_db),
+):
+    prop = db.query(Property).filter(Property.id == property_id).first()
+
+    if not prop:
+        raise HTTPException(status_code=404, detail="Property not found")
+
+    stop = ServiceStop(
+        date=date.strip(),
+        tech_name=tech_name.strip(),
+        problem_reported=problem_reported.strip(),
+        work_performed=work_performed.strip(),
+        recommendation=recommendation.strip(),
+        billed_amount=billed_amount or 0,
+        labor_hours=labor_hours or 0,
+        material_cost=material_cost or 0,
+        trip_charge=trip_charge or 0,
+        tax=tax or 0,
+        paid_status=paid_status.strip() or "unpaid",
+        invoice_notes=invoice_notes.strip(),
+        status=status.strip() or "completed",
+        property_id=prop.id,
+    )
+
+    db.add(stop)
+    db.commit()
+    db.refresh(stop)
+
+    return RedirectResponse(url=f"/service-stops/{stop.id}", status_code=303)
+
+
 @app.get("/service-stops/{stop_id}", response_class=HTMLResponse)
 def service_stop_detail(request: Request, stop_id: int, db: Session = Depends(get_db)):
     stop = (
@@ -218,6 +223,8 @@ def service_stop_detail(request: Request, stop_id: int, db: Session = Depends(ge
             "invoice_total": invoice_total,
         },
     )
+
+
 @app.get("/schedule", response_class=HTMLResponse)
 def schedule_page(request: Request, db: Session = Depends(get_db)):
     schedule_items = (
@@ -227,11 +234,50 @@ def schedule_page(request: Request, db: Session = Depends(get_db)):
         .all()
     )
 
+    today = date.today()
+    today_str = today.isoformat()
+    tomorrow = today.fromordinal(today.toordinal() + 1)
+    tomorrow_str = tomorrow.isoformat()
+
+    today_items = []
+    tomorrow_items = []
+    upcoming_items = []
+    unscheduled_items = []
+
+    for item in schedule_items:
+        item_date = (item.date or "").strip()
+
+        if not item_date:
+            unscheduled_items.append(item)
+            continue
+
+        if item_date == today_str:
+            today_items.append(item)
+            continue
+
+        if item_date == tomorrow_str:
+            tomorrow_items.append(item)
+            continue
+
+        try:
+            parsed = datetime.strptime(item_date, "%Y-%m-%d").date()
+            if parsed > tomorrow:
+                upcoming_items.append(item)
+            else:
+                unscheduled_items.append(item)
+        except ValueError:
+            unscheduled_items.append(item)
+
     return templates.TemplateResponse(
         request,
         "schedule.html",
         {
-            "schedule_items": schedule_items,
+            "today_items": today_items,
+            "tomorrow_items": tomorrow_items,
+            "upcoming_items": upcoming_items,
+            "unscheduled_items": unscheduled_items,
+            "today_str": today_str,
+            "tomorrow_str": tomorrow_str,
         },
     )
 
@@ -282,6 +328,7 @@ def create_schedule_item(
 
     return RedirectResponse(url="/schedule", status_code=303)
 
+
 @app.get("/dev/seed")
 def seed(db: Session = Depends(get_db)):
     existing_property = db.query(Property).filter(Property.address == "1234 Oak Hill Rd").first()
@@ -326,4 +373,18 @@ def seed(db: Session = Depends(get_db)):
     db.add(stop)
     db.commit()
 
+    demo_schedule = ScheduleItem(
+        property_id=prop.id,
+        date=today_str_for_seed(),
+        assigned_to="Mike",
+        status="scheduled",
+        notes="Demo scheduled job",
+    )
+    db.add(demo_schedule)
+    db.commit()
+
     return {"status": "seeded"}
+
+
+def today_str_for_seed():
+    return date.today().isoformat()
